@@ -1,0 +1,1190 @@
+/** \file NXT2WIFI.nxc
+ * \brief NXC Library for NXT2WIFI device
+ *
+ * NXT2WIFI.nxc is a NXC library to use NXT2WIFI in your robots
+ *
+ * License:
+ *
+ * The contents of this file are subject to the Mozilla Public License
+ * Version 3.0 (the "License"); you may not use this file except in
+ * compliance with the License. You may obtain a copy of the License at
+ * http://www.mozilla.org/MPL/
+ *
+ * Software distributed under the License is distributed on an "AS IS"
+ * basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
+ * License for the specific language governing rights and limitations
+ * under the License.
+ *
+ * The Initial Developer of this code is Daniele Benedettelli.
+ * Portions created by Daniele Benedettelli
+ * are Copyright (C) 2012-2013 Daniele Benedettelli
+ * All Rights Reserved.
+ *
+ * ----------------------------------------------------------------------------
+ * \title NXT2WIFI NXC Programming Language Library
+ * \author Daniele Benedettelli
+ * \date 2012-10-26
+ * \version 1.0.121026
+ */
+
+#ifndef ___FLYPORTLIB_NXC
+#define ___FLYPORTLIB_NXC
+
+// latest firmware version check
+#define CHK_VER 121116
+
+#define WEB_CTRL_BTN    0 	/*!< Webpage Widget Button */
+#define WEB_CTRL_SLD    1 	/*!< Webpage Widget Slider */
+#define WEB_CTRL_CHK    2 	/*!< Webpage widget Checkbox */
+#define WEB_CTRL_LBL    3 	/*!< Webpage widget Label */
+#define WEB_CTRL_BAR    4 	/*!< Webpage widget Bargraph */
+
+///////////////////////////////////////////////////////////////////////////////
+//////////////////////// LOW LEVEL COMMUNICATION //////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+
+#define TIMEOUT 150
+
+// buffer for incoming data
+int _inBytes = 0;
+string _instr = "";
+byte _inbuf[100];
+#define REPLY (_inBytes>0)
+
+///////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////// DATA PARSING //////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+/** @defgroup Parsing Utilities to parse response strings
+ Low level utilities that are used to parse response data from the device
+ * @{
+ */
+
+/*!
+ Accepts a byte buffer filled by serial port data and returns true
+ if the data contains a Webpage Event Direct Command.
+ 0x00 0x80 0x14 [ID] [EVENT] [VAL] <br>
+ [ID] = 0...2 type of widget that generated the event <br>
+ [EVENT] = 0...255 event <br>
+ [VAL] = 0...255 value of the widget <br>
+ */
+bool IsWebEvent(byte cmd[]) {
+	int len = ArrayLen(cmd);
+	if (len<5) return false;
+	if (cmd[0]==0x00 && cmd[2]==0x14) return true;
+	else return false;
+}
+
+/*!
+ Find the "=" char in a string and save the integer in
+ the variable passed by reference.
+ \param str the string that contains the integer to be retrieved ()
+ \param value variable where the parsed integer value will be saved
+ \returns true if parsing succeeded
+ */
+bool parseIntResult(string str, int &value) {
+	int len = StrLen(str);
+	int i = Pos ("=",str);
+	if (i<0) return false;
+	string valStr = SubStr(str,i+1,len-i-1);
+	value = StrToNum(valStr);
+	return true;
+}
+
+/*!
+ Find the "=" char in a string and save the text after the "="
+ in the string passed by reference.
+ \param str the string that contains the integer to be retrieved ()
+ \param value string variable where the response string will be saved
+ \returns true if parsing succeeded
+ */
+bool parseStringResult(string str, string &value) {
+	int len = StrLen(str);
+	int i = Pos ("=",str);
+	if (i<0) return false;
+	value = SubStr(str,i+1,len-i-1);
+	return true;
+}
+
+/*!
+ Find the "=" char in a string and save two strings separated
+ by a comma in the strings passed by reference.
+ \param str the string that contains the integer to be retrieved ()
+ \param value1 string variable where the first response string will be saved
+ \param value2 string variable where the second response string will be saved
+ \returns true if parsing succeeded
+ */
+bool parseDoubleStringResult(string str, string &value1, string &value2) {
+	value1 = "";
+	value2 = "";
+	int len = StrLen(str);
+	int i = Pos ("=",str);
+	int j = Pos(",",str);
+	if (i<0 || j<0 || j<i) return false;
+	value1 = SubStr(str,i+1,j-i-1);
+	value2 = SubStr(str,j+1,len-j-1);
+	return true;
+}
+/** @} */ // end of Parsing group
+
+///////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////// COMMUNICATION /////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+/** @defgroup Comm Low level communication 
+ Functions to send and read data from RS485
+ * @{
+ */
+
+/*!
+ Wait for incoming data on RS485
+ \param buffer byte array to be filled, passed by reference
+ \param timeout time to wait before returning, in milliseconds
+ \returns the number of bytes read (in case of timeout returns 0)
+ */
+inline int waitRS485Data(byte &buffer[], int timeout) {
+	int aval = 0;
+	long time = CurrentTick();
+	while(aval==0 && ( (timeout==0) || (CurrentTick()-time<timeout) ) ) {
+		aval = RS485DataAvailable();
+		Wait(4);
+	}
+	Wait(4);
+	aval = RS485DataAvailable();
+	RS485Read(buffer);
+	return aval;
+}
+
+/*!
+ Send a string over RS485, appending a line feed byte
+\param msg the string to send
+ */
+void RS485Send(string msg) {
+	byte out[];
+	//int len = 0;
+	byte nld[1] = {10};
+	string nl = ByteArrayToStr(nld);
+	msg = StrCat(msg,nl);
+	StrToByteArray(msg,out);
+	int len = StrLen(msg);
+	RS485Write(out);
+	if (len<80) len = 80;
+	Wait(len);
+}
+
+void RS485SendNoPause(string msg) {
+	byte out[];
+	//int len = 0;
+	byte nld[1] = {10};
+	string nl = ByteArrayToStr(nld);
+	msg = StrCat(msg,nl);
+	StrToByteArray(msg,out);
+	int len = StrLen(msg);
+	RS485Write(out);
+	while(HSState()== HS_SEND_DATA) Wait(1);
+}
+
+int HSSendMsg(string msg)
+{
+	byte out[];
+	//int len = 0;
+	byte nld[1] = {10};
+	string nl = ByteArrayToStr(nld);
+	msg = StrCat(msg,nl);
+	StrToByteArray(msg,out);
+	byte len = StrLen(msg);
+  SetHSInputBufferInPtr(0);
+  SetHSInputBufferOutPtr(0);
+  SetHSOutputBuffer(0, len, out);
+  SetHSOutputBufferOutPtr(0);
+  SetHSOutputBufferInPtr(len);   // <<---- Problem
+  SetHSState(HS_SEND_DATA);
+  SetHSFlags(HS_UPDATE); //send it
+  while(HSOutputBufferOutPtr() < HSOutputBufferInPtr())
+    Wait(1);
+  return 1;
+}
+
+/*!
+ Flush RS485 input buffer
+ */
+void flushRS485() {
+	RS485Send("$");
+	byte buf[10];
+	int aval = 1;
+	while( aval!=0 ) {
+		aval = RS485DataAvailable();
+		RS485Read(buf);
+	}
+	Wait(50);
+}
+
+/*!
+ Wait for incoming data on RS485
+ \param timeout time to wait before returning, in milliseconds
+ \returns the incoming string
+ */
+inline string waitData(long timeout) {
+	_instr[0] = 0;
+	_inBytes = 0;
+	long time = CurrentTick();
+	while(_inBytes==0 && ( (timeout==0) || (CurrentTick()-time<timeout) ) ) {
+		_inBytes = RS485DataAvailable();
+		Wait(4);
+	}
+	Wait(4);
+	_inBytes = RS485DataAvailable();
+	RS485ReadEx(_inbuf, _inBytes);
+	if (_inBytes>0) {
+		_instr = ByteArrayToStr(_inbuf);
+	}
+	return _instr;
+}
+
+/*!
+ Wait integer data
+\param timeout the time in ms to wait the answer before returning.
+\param def the integer to return in case of timeout.
+\returns the incoming integer 
+ */
+int waitDataInt(long timeout, int def) {
+  	waitData(timeout);
+	int value = -1;
+  	if (REPLY) {
+		parseIntResult(_instr, value);
+	} else value = def;
+	return value;
+}
+
+/*!
+ Wait string data
+\param timeout the time in ms to wait the answer before returning.
+\param def the string to return in case of timeout.
+\returns the incoming string data
+ */
+string waitDataString(long timeout, string def) {
+  	waitData(timeout);
+	string value = "";
+  	if (REPLY) {
+		parseStringResult(_instr, value);
+	} else value = def;
+	//TextOut(0,LCD_LINE7,value);
+	//TextOut(0,LCD_LINE8,_instr);
+	return value;
+}
+/** @} */ // end of Comm group
+
+
+///////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////// WEBPAGE MANAGEMENT/////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+/** @defgroup WebFunctions Managing the Graphic Webserver
+ Functions to update values of the graphic webserver webpage widgets
+ * @{
+ */
+
+/*!
+ Update a label on the webpage
+\param id the label id
+\param data the string data to be written in the label
+\param datalen the string length (if 0, it will be computed automatically
+ */
+void WIFI_Web_UpdateLabel(int id, string data, int datalen) {
+	string outstr = " ";
+	if (datalen ==0) datalen = StrLen(data);
+	outstr = StrCat("$WEBLBL",NumToStr(id),"?",NumToStr(datalen),",",data);
+	RS485Send(outstr);
+	Wait(80);
+}
+
+/*!
+ Update a Button on the webpage
+\param id the button id
+\param state 1 for pressed, 0 for raised
+ */
+void WIFI_Web_UpdateButton(int id, bool state) {
+	string outstr = " ";
+	outstr = StrCat("$WEBBTN",NumToStr(id),"?");
+	if (state==1) outstr = StrCat(outstr,"1");
+	else outstr = StrCat(outstr,"0");
+	RS485Send(outstr);
+	Wait(80);
+}
+
+/*!
+ Update a Checkbox on the webpage
+\param id the checkbox id
+\param state 1 for checked, 0 for unchecked
+ */
+void WIFI_Web_UpdateCheckBox(int id, bool state) {
+	string outstr = " ";
+	outstr = StrCat("$WEBCHK",NumToStr(id),"?");
+	if (state==1) outstr = StrCat(outstr,"1");
+	else outstr = StrCat(outstr,"0");
+	RS485Send(outstr);
+	Wait(80);
+}
+
+/*!
+ Update a Bar Graph on the webpage
+\param id the bar graph id
+\param value the bar graph value you want to display
+ */
+void WIFI_Web_UpdateBarGraph(int id, int value) {
+	string outstr = " ";
+	outstr = StrCat("$WEBBAR",NumToStr(id),"?",NumToStr(value));
+	RS485Send(outstr);
+	Wait(80);
+}
+
+/*!
+ Update a Slider on the webpage
+\param id the bar graph id
+\param value the slider position
+ */
+void WIFI_Web_UpdateSlider(int id, int value) {
+	string outstr = " ";
+	outstr = StrCat("$WEBSLD",NumToStr(id),"?",NumToStr(value));
+	RS485Send(outstr);
+	Wait(80);
+}
+
+/*!
+ Enable/disable webserver functionality <br>
+ (spontaneous messages generated by events on the webpage)
+ */
+void WIFI_Web_Enable(bool en) {
+	if (en) RS485Send("$SRV1");
+	else RS485Send("$SRV0");
+	Wait(80);
+}
+
+/*!
+ Reset and clear all widgets on the webpage
+ */
+void WIFI_Web_ClearAll() {
+	RS485Send("$WEBCLR");
+	Wait(80);
+}
+/** @} */ // end of WebFunctions group
+
+///////////////////////////////////////////////////////////////////////////////
+////////////////////////////// WIFI NETWORK ///////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+/** @defgroup WIFI Managing the Wi-Fi Connection
+ Functions to manage Wi-Fi Networking, and custom connection profile settings.
+ * @{
+ */
+
+/*! Connect to Wi-Fi using specified profile
+\param custom true for custom, false for default
+*/
+void WIFI_Connect(bool custom) {
+	string cc;
+	if (custom) RS485Send("$WFC1");
+	else RS485Send("$WFC0");
+}
+
+/*! Disconnect from Wi-Fi
+*/
+void WIFI_Disconnect() {
+   RS485Send("$WFX");
+}
+
+/*! Stop trying to connect to Wi-Fi
+*/
+void WIFI_StopConnecting() {
+   RS485Send("$WFQ");
+}
+
+/*! Delete custom Wi-Fi profile
+*/
+void WIFI_Delete() {
+	RS485Send("$WFKD");
+}
+
+/*! Save custom Wi-Fi profile
+*/
+void WIFI_Save() {
+	RS485Send("$WFKS");
+	Wait(100);
+}
+
+/*! Load custom Wi-Fi profile
+*/
+void WIFI_Load() {
+	RS485Send("$WFKL");
+}
+
+/** @defgroup SecurityModes The Wi-Fi security modes
+ * Pass one of this constants to the \ref WIFI_Security function.
+ * @{
+ */
+// WIFI_ security modes
+#define WF_SEC_OPEN 						0 /*!< No security */
+#define WF_SEC_WEP_40 					1 /*!< WEP security (10 hex chars) */
+#define WF_SEC_WEP_104					2 /*!< WEP security (26 hex chars) */
+#define WF_SEC_WPA_KEY					3 /*!< WPA with key (64 hex chars) */
+#define WF_SEC_WPA_PASSPHRASE 		4 /*!< WPA with passphrase */
+#define WF_SEC_WPA2_KEY					5 /*!< WPA2 with key (64 hex chars) */
+#define WF_SEC_WPA2_PASSPHRASE 		6 /*!< WPA2 with passphrase */
+#define WF_SEC_WPA_AUTO_KEY 			7 /*!< WPA autoselect with key (64 hex chars) */
+#define WF_SEC_WPA_AUTO_PASSPHRASE	8 /*!< WPA autoselect with passphrase */
+/** @} */ // end of SecurityModes group
+
+#define AD_HOC 1
+#define INFRASTRUCTURE 0
+
+/*! Set security general function
+\param mode one of the security modes \ref SecurityModes
+\param keypass the passkey or the passphrase 
+\param keyind the key index (valid only with WEP option, ignored otherwise)
+*/
+void WIFI_Security(int mode, string keypass, int keyind) {
+	string out = "$WFS?";
+	out = StrCat(out,NumToStr(mode));
+	out = StrCat(out,":");
+	out = StrCat(out,keypass);
+	out = StrCat(out,":");
+	out = StrCat(out,NumToStr(keyind));
+	RS485Send(out);
+}
+
+/*! Set security WEP 40 bit
+*/
+void WIFI_SecurityWEP40(string key, int index) {
+	WIFI_Security(WF_SEC_WEP_40, key, index);
+}
+
+/*! Set security WEP 104 bit
+*/
+void WIFI_SecurityWEP104(string key, int index) {
+	WIFI_Security(WF_SEC_WEP_104, key, index);
+}
+
+/*! Set security WPA with key
+*/
+void WIFI_SecurityWPAKey(string key) {
+	WIFI_Security(WF_SEC_WPA_KEY, key, 0);
+}
+
+/*! Set security WPA with passphrase (30s needed first time it connects)
+*/
+void WIFI_SecurityWPAPassphrase(string passphrase) {
+	WIFI_Security(WF_SEC_WPA_PASSPHRASE, passphrase, 0);
+}
+
+/*! Set security WPA2 with key
+*/
+void WIFI_SecurityWPA2Key(string key) {
+	WIFI_Security(WF_SEC_WPA2_KEY, key, 0);
+}
+
+/*! Set security WPA2 with passphrase (30s needed first time it connects)
+*/
+void WIFI_SecurityWPA2Passphrase(string passphrase) {
+	WIFI_Security(WF_SEC_WPA2_PASSPHRASE, passphrase, 0);
+}
+
+/*! Set security Open
+*/
+void WIFI_SecurityOpen() {
+	RS485Send("$WFS?0");
+}
+
+/*! Select AdHoc/Infrastructure network type for the Wi-Fi custom profile
+\param adhoc true for adhoc, false for infrastructure
+*/
+void WIFI_SetAdHoc(bool adhoc) {
+	string out = "$WFE?TYPE=";
+	int type = adhoc?1:0;
+	out = StrCat(out,NumToStr(type));
+	RS485Send(out);
+}
+
+// private method
+void _WIFI_SetPar(string type, string address) {
+	string out = "$WFE?";
+	out = StrCat(out,type);
+	out = StrCat(out,"=");
+	out = StrCat(out,address);
+	RS485Send(out);
+}
+
+/*! Set IP address of the custom Wi-Fi profile */
+#define WIFI_SetIPAddress(string address) _WIFI_SetPar("IPAD",address)
+/*! Set subnet mask of the custom Wi-Fi profile */
+#define WIFI_SetMask(string address) _WIFI_SetPar("MASK",address)
+/*! Set gateway of the custom Wi-Fi profile */
+#define WIFI_SetGateway(string address) _WIFI_SetPar("GWAY",address)
+/*! Set DNS1 of the custom Wi-Fi profile */
+#define WIFI_SetDNS1(string address) _WIFI_SetPar("DNS1",address)
+/*! Set DNS2 of the custom Wi-Fi profile */
+#define WIFI_SetDNS2(string address) _WIFI_SetPar("DNS2",address)
+/*! Set the SSID (name) of the custom Wi-Fi profile */
+#define WIFI_SetSSID(string name) _WIFI_SetPar("SSID",name)
+/*! Set the NETbios name of the device */
+#define WIFI_SetNetbiosName(string name) _WIFI_SetPar("NAME",name)
+
+// private method
+string _WIFI_GetPar(string type) {
+	WIFI_Load();
+	string out = "$WFKC?";
+	out = StrCat(out,type);
+	RS485Send(out);
+	return waitDataString(TIMEOUT,"");
+}
+
+/*! Get IP address of the custom Wi-Fi profile */
+#define WIFI_GetIPAddress() _WIFI_GetPar("IPAD")
+/*! Get subnet mask of the custom Wi-Fi profile */
+#define WIFI_GetMask() _WIFI_GetPar("MASK")
+/*! Get gateway of the custom Wi-Fi profile */
+#define WIFI_GetGateway() _WIFI_GetPar("GWAY")
+/*! Get DNS1 of the custom Wi-Fi profile */
+#define WIFI_GetDNS1() _WIFI_GetPar("DNS1")
+/*! Get DNS2 of the custom Wi-Fi profile */
+#define WIFI_GetDNS2() _WIFI_GetPar("DNS2")
+/*! Get the SSID (name) of the custom Wi-Fi profile */
+#define WIFI_GetSSID() _WIFI_GetPar("SSID")
+/*! Get the NETbios name of the device */
+#define WIFI_GetNetbiosName() _WIFI_GetPar("NAME")
+/*! Get the Security settings of the custom Wi-Fi profile */
+#define WIFI_GetSecuritySettings() _WIFI_GetPar("SCRT")
+
+/*! Enable/Disable DHCP. When enabled,
+the device receives the IP address from the access point it connects to.
+*/
+void WIFI_EnableDHCP(bool yes) {
+	string out = "$WFE?DHCP=";
+	int en = yes?1:0;
+	out = StrCat(out,NumToStr(en));
+	RS485Send(out);
+}
+
+/*! Returns true if the custom Wi-Fi profile has been set
+*/
+bool WIFI_CustomExist() {
+	int value = 0;
+	RS485Send("$WFKE");
+	return (waitDataInt(TIMEOUT,-1)==1);
+}
+
+/*! Returns the Wi-Fi connection status <br>
+	NOT_CONNECTED 0 <br>
+	CONNECTING 1 <br>
+	CONNECTED 2 <br>
+	CONNECTION_LOST 3 <br>
+	CONNECTION_FAILED 4 <br>
+	STOPPING 5 <br>
+	TURNED_OFF 6 <br>
+*/
+int WIFI_Status() {
+	int value = 0;
+	RS485Send("$WFGS");
+	return waitDataInt(TIMEOUT,-1);
+}
+
+/*!
+ Returns true if device is connected to a network.
+\sa WIFI_Status
+*/
+bool WIFI_Connected() {
+	return (WIFI_Status()==2);
+}
+
+/*!
+ Get the current ip address
+*/
+string WIFI_GetCurrentIP() {
+	string ip = "";
+	RS485Send("$WFIP");
+	return waitDataString(TIMEOUT,"0.0.0.0");
+}
+
+/*!
+ Check if DHCP assigned a new address
+*/
+bool WIFI_DHCPAssigned() {
+	string ip = "";
+	RS485Send("$WFAA");
+	return (waitDataInt(TIMEOUT,-1)==1);
+}
+
+/*!
+ Get the Wi-Fi module MAC address
+*/
+string WIFI_GetMAC() {
+	string out = "$MAC";
+	RS485Send(out);
+	return waitDataString(TIMEOUT,"000000000000");
+}
+
+/*!
+ Force ARP request for specified ip
+*/
+void WIFI_ARPRequest(string ip) {
+	string out = StrCat("$ARP?",ip);
+	RS485Send(out);
+}
+/** @} */ // end of WIFI group
+
+///////////////////////////////////////////////////////////////////////////////
+////////////////////////////// TCP /////// ///////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+/** @defgroup TCP Managing TCP sockets
+Functions to exchange data using TCP sockets
+ * @{
+ */
+
+/*!
+ Open TCP client socket
+\param id socket internal id 1,2,3,4
+\param ip the server IP address
+\param port the server port
+\returns true if successful, false otherwise
+*/
+bool WIFI_TCPOpenClient(int id, string ip, int port) {
+	string s = NumToStr(id);
+	string portStr = NumToStr(port);
+	string out = StrCat("$TCPOC",s,"?",ip,",",portStr);
+	RS485Send(out);
+	return (waitDataInt(TIMEOUT,-1)==1);
+}
+
+/*!
+ Open TCP server socket
+\param id socket internal id 1,2,3,4
+\param port the port
+\returns true if successful, false otherwise
+*/
+bool WIFI_TCPOpenServer(int id, string port) {
+	string s = NumToStr(id);
+	string out = StrCat("$TCPOS",s,"?",port);
+	RS485Send(out);
+	return (waitDataInt(TIMEOUT,-1)==1);
+}
+
+/*!
+ Detach remove TCP client
+\param id socket internal id 1,2,3,4 (must be a server socket)
+\returns true if successful, false otherwise
+*/
+bool WIFI_TCPDetachClient(int id) {
+	string s = NumToStr(id);
+	string out = StrCat("$TCPD",s);
+	RS485Send(out);
+	return (waitDataInt(TIMEOUT,-1)==1);
+}
+
+/*!
+ Close TCP socket
+\param id socket internal id 1,2,3,4
+\returns true if successful, false otherwise
+*/
+bool WIFI_TCPClose(int id) {
+	string s = NumToStr(id);
+	string out = StrCat("$TCPX",s);
+	RS485Send(out);
+	return (waitDataInt(TIMEOUT,-1)==1);
+}
+
+/*!
+ Close all TCP sockets
+*/
+bool WIFI_TCPCloseAll() {
+	return WIFI_TCPClose(0);
+}
+
+/*!
+Get the number of Bytes available to be read from socket
+\param id socket internal id 1,2,3,4
+\returns the number of bytes available to be read from socket
+*/
+int WIFI_TCPAvail(int id) {
+	string s = NumToStr(id);
+	string out = StrCat("$TCPL",s);
+	RS485Send(out);
+	return waitDataInt(TIMEOUT,-1);
+}
+
+/*!
+Get the status of the socket
+\param id socket internal id 1,2,3,4
+\returns true if connected, false if disconnected or closed
+*/
+bool WIFI_TCPStatus(int id) {
+	string out = StrCat("$TCPI",NumToStr(id));
+	RS485Send(out);
+	string in = waitDataString(TIMEOUT,"");
+	if (REPLY) {
+		return ((in[1]-48)==1);
+	} else return false;
+}
+
+/*!
+Read data from socket
+\param id socket internal id 1,2,3,4
+\param datalen number of bytes to be read
+\param data string passed by reference where to save data
+*/
+int WIFI_TCPRead(int id, int datalen, string &data) {
+	string s = NumToStr(id);
+	string dl = NumToStr(datalen);
+	string out = StrCat("$TCPR",s,"?",dl);
+	RS485Send(out);
+	int len = 0;
+	data = "";
+	waitDataString(TIMEOUT,",");
+	string lenStr = "";
+	if (REPLY) {
+		if (parseDoubleStringResult(_instr, lenStr, data)) {
+			len = StrToNum(lenStr);
+		}
+	}
+	return len;
+}
+
+/*!
+Write data to socket
+\param id socket internal id 1,2,3,4
+\param data string to be written
+\param datalen length of the string (if 0, string length is measured)
+*/
+int WIFI_TCPWrite(int id, string data, int datalen=0) {
+	string s = NumToStr(id);
+   if (datalen ==0) datalen = StrLen(data);
+	string len = NumToStr(datalen);
+	string out = StrCat("$TCPW",s,"?",len,",",data);
+	RS485Send(out);
+	return waitDataInt(TIMEOUT,-1);
+}
+
+/*!
+Get the remote TCP socket MAC address
+\param id socket internal id 1,2,3,4
+\returns the mac address. <br>
+Error codes:<br>
+000000000000 if socket is closed.<br>
+000000000001 if socket is not connected.
+*/
+string WIFI_TCPRemoteMAC(int id) {
+	string mac = "";
+	string s = NumToStr(id);
+	string out = StrCat("$TCPSM",s);
+	RS485Send(out);
+	waitDataString(TIMEOUT,"");
+	if (REPLY) {
+		parseStringResult(_instr, mac);
+	}
+	return mac;
+}
+
+/*!
+Get the remote TCP socket IP address
+\param id socket internal id 1,2,3,4
+\returns the ip address. <br>
+Error codes:<br>
+0.0.0.0 if socket is closed. <br>
+0.0.0.1 if socket is not connected.
+*/
+string WIFI_TCPRemoteIP(int id) {
+	string ip = "";
+	string s = NumToStr(id);
+	string out = StrCat("$TCPSI",s);
+	RS485Send(out);
+	waitDataString(TIMEOUT,"");
+	if (REPLY) {
+		parseStringResult(_instr, ip);
+	}
+	return ip;
+}
+
+/** @} */ // end of TCP group
+
+///////////////////////////////////////////////////////////////////////////////
+////////////////////////////// UDP   ////// ///////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+/** @defgroup UDP Managing UDP sockets
+Functions to exchange data using UDP sockets
+ * @{
+ */
+
+/*!
+ Open UDP server socket
+\param id socket internal id 1,2,3,4
+\param port the port
+*/
+bool WIFI_UDPOpenServer(int id, int port) {
+	string s = NumToStr(id);
+	string portStr = NumToStr(port);
+	string out = StrCat("$UDPOS",s,"?",portStr);
+	RS485Send(out);
+	return (waitDataInt(TIMEOUT,-1)==1);
+}
+
+/*!
+ Open UDP client socket
+\param id socket internal id 1,2,3,4
+\param ip the server IP address
+\param port the server port
+*/
+bool WIFI_UDPOpenClient(int id, string ip, int port) {
+	string s = NumToStr(id);
+	string portStr = NumToStr(port);
+	string out = StrCat("$UDPOC",s,"?",ip,",",portStr);
+	RS485Send(out);
+	return (waitDataInt(TIMEOUT,-1)==1);
+}
+
+/*!
+ Open UDP broadcast socket
+\param id socket internal id 1,2,3,4
+\param port the port
+\returns true if successful, false otherwise
+*/
+bool WIFI_UDPOpenBroadcast(int id, int port) {
+	string s = NumToStr(id);
+	string portStr = NumToStr(port);
+	string out = StrCat("$UDPOB",s,"?",portStr);
+	RS485Send(out);
+	return (waitDataInt(TIMEOUT,-1)==1);
+}
+
+/*!
+ Close UDP socket
+\param id socket internal id 1,2,3,4
+\returns true if successful, false otherwise
+*/
+bool WIFI_UDPClose(int id) {
+	string s = NumToStr(id);
+	string out = StrCat("$UDPX",s);
+	RS485Send(out);
+	return (waitDataInt(TIMEOUT,-1)==1);
+}
+
+/*!
+Get the number of Bytes available to be read from socket
+\param id socket internal id 1,2,3,4
+\returns the number of Bytes available to be read from socket
+*/
+int WIFI_UDPAvail(int id) {
+	string s = NumToStr(id);
+	string out = StrCat("$UDPL",s);
+	RS485Send(out);
+	return waitDataInt(TIMEOUT,-1);
+}
+
+/*!
+ Returns true if a UDP buffer overflow is detected
+\param id socket internal id 1,2,3,4
+\return true if the buffer overflew, false otherwise
+*/
+bool WIFI_UDPOverflow(int id) {
+	string s = NumToStr(id);
+	string out = StrCat("$UDPV",s);
+	RS485Send(out);
+	return (waitDataInt(TIMEOUT,-1)>0);
+}
+
+/*!
+ Flush the UDP socket input buffer.
+\param id socket internal id 1,2,3,4
+\return true upon success
+*/
+bool WIFI_UDPFlush(int id) {
+	string s = NumToStr(id);
+	string out = StrCat("$UDPF",s);
+	RS485Send(out);
+	return (waitDataInt(TIMEOUT,-1)>0);
+}
+
+/*!
+Read data from socket
+\param id socket internal id 1,2,3,4
+\param datalen number of bytes to be read
+\param data string passed by reference where to save data
+\returns the number of characters of the read string
+*/
+int WIFI_UDPRead(int id, int datalen, string &data) {
+	string s = NumToStr(id);
+	string dl = NumToStr(datalen);
+	string out = StrCat("$UDPR",s,"?",dl);
+	HSSendMsg(out);
+	Wait(50);
+	int len = 0;
+	data = "";
+	waitDataString(TIMEOUT,",");
+	string lenStr = "";
+	if (REPLY) {
+		if (parseDoubleStringResult(_instr, lenStr, data)) {
+			len = StrToNum(lenStr);
+		}
+	}
+	return len;
+}
+
+/*!
+Write data to socket
+\param id socket internal id 1,2,3,4
+\param data string to be written
+\param datalen length of the string (if 0, string length is measured)
+\returns the number of bytes written
+*/
+int WIFI_UDPWrite(int id, string data, int datalen=0) {
+	string s = NumToStr(id);
+   if (datalen ==0) datalen = StrLen(data);
+	string len = NumToStr(datalen);
+	string out = StrCat("$UDPW",s,"?",len,",",data);
+	RS485Send(out);
+	return waitDataInt(TIMEOUT,-1);
+}
+
+/** @} */ // end of UDP group
+
+/** @defgroup Time Getting the time (Real Time Clock)
+ Functions to get the Time from the on board real time clock.
+ If the device is connected to a network that has internet access, the real
+ date and time of the day can be retrieved.
+ * @{
+ */
+
+/*!
+ Get the date and time string "YYYY-MM-DD/HH:MM:SS"
+ \param zone the hours difference from GMT (e.g. for Rome is 2)
+*/
+string WIFI_GetDateTime(int zone) {
+	string s = NumToStr(zone);
+	string out = StrCat("$GTIM","?",s);
+	RS485Send(out);
+	return waitDataString(TIMEOUT,"0000-00-00/00:00:00");
+}
+
+/*!
+ Get the time string "HH:MM:SS"
+ \param zone the hours difference from GMT (e.g. for Rome is 2)
+*/
+string WIFI_GetTime(int zone) {
+	string dt = WIFI_GetDateTime(zone);
+	int len = StrLen(dt);
+	int i = Pos ("/",dt);
+	if (i<0) return "00:00:00";
+	string time = SubStr(dt,i+1,len-i-1);
+	return time;
+}
+
+/*!
+ Get the date string "YYYY-MM-DD"
+ \param zone the hours difference from GMT (e.g. for Rome is 2)
+*/
+string WIFI_GetDate(int zone) {
+	string dt = WIFI_GetDateTime(zone);
+	int len = StrLen(dt);
+	int i = Pos ("/",dt);
+	if (i<0) return "0000-00-00";
+	string time = SubStr(dt,0,i);
+	return time;
+}
+/** @} */ // end of Time group
+
+///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////// UTILITIES //////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+/** @defgroup Utilities Managing Serial Communication
+ Functions to change serial communication speed, enable debug stream on computer,
+ manage power saving...
+ * @{
+ */
+
+/*! Enable/Disable debug stream on computer serial terminal
+	( virtual COM available when connected to mini USB) <br>
+	Settings: 115200 baud, 8 data bits, no parity, 1 stop bit
+*/
+void WIFI_SetDebug(bool en) {
+	if (en) {
+		RS485Send("$DBG1");
+	} else {
+		RS485Send("$DBG0");
+	}
+}
+
+/*!
+ Get NXT2WIFI current firmware version
+*/
+string WIFI_GetFW() {
+	string out = "$FW";
+	RS485Send(out);
+	return waitDataString(TIMEOUT," ");
+}
+
+/*!
+ Internal function. Check if NXT2WIFI is responding, <br>
+and check if firmware version is up-to-date with library.
+*/
+void _check_version() {
+	string fw = WIFI_GetFW();
+	int len = StrLen(fw);
+	if (len==0) {
+		ClearScreen();
+		TextOut(0,LCD_LINE1,"NXT2WIFI  ");
+		TextOut(0,LCD_LINE2,"not found!");
+		Wait(3000);
+		ClearScreen();
+	} else {
+		string v = SubStr(fw,len-6,6);
+		long fwver = StrToNum(v);
+		if (CHK_VER>fwver) {
+			ClearScreen();
+			TextOut(0,LCD_LINE1,"NXT2WIFI f/w ");
+			TextOut(0,LCD_LINE2,fw);
+			TextOut(0,LCD_LINE3,"is old.");
+			TextOut(0,LCD_LINE4,"Update it!");
+			Wait(3000);
+			ClearScreen();
+		}
+	}
+}
+
+/*! Initialize communication with device at default speed of 230400 Baud.
+ This function MUST be called at the beginning of your program
+*/
+void WIFI_Init() {
+   UseRS485();
+   RS485Uart(HS_BAUD_230400 , HS_MODE_8N1);
+	SetHSDataMode(DATA_MODE_RAW);
+	Wait(200);
+	_check_version();
+}
+
+/*! Stops the communication thread.
+WARNING: Internal function! Don't use this function directly in your code.
+*/
+//void WIFI_SerialDisable() {
+//	stop SerialCommunication;
+//	Wait(200);
+//}
+
+/*! Restart device (equivalent to pressing the hardware reset button)
+*/
+void WIFI_Reset() {
+	RS485Send("$RST");
+}
+
+/*! Put Wi-Fi module to hibernation (power saving mode)
+or turn it on (reconnection needed).
+\param h true hibernate, false exit hibernation.
+*/
+void WIFI_Hibernation(bool h) {
+	if (h)
+		RS485Send("$WFH");
+	else
+		RS485Send("$WFO");
+}
+
+/*! Initialize communication with device at the requested speed
+\param speed a NXC valid speed constant (e.g. HS_BAUD_230400)
+*/
+void WIFI_InitX(int speed) {
+   UseRS485();
+   RS485Uart(speed , HS_MODE_8N1);
+	SetHSDataMode(DATA_MODE_RAW);
+	Wait(200);
+}
+
+/*! Ping device without having the SerialCommunication responder task running
+\returns true if device responded to ping
+*/
+bool WIFI_PingLowLevel() {
+   string strReceive;
+	byte buffer[64];
+	byte out[];
+	// send ping command
+	byte nld[1] = {10};
+	string nl = ByteArrayToStr(nld);
+	string outstr = StrCat("$???",nl);
+	StrToByteArray(outstr,out);
+	RS485Write(out);
+	// wait for response
+	bool ping = false;
+	int aval = 0;
+	long time = CurrentTick();
+	while(aval==0 && ( (CurrentTick()-time<100) ) ) {
+		aval = RS485DataAvailable();
+		Wait(4);
+	}
+	Wait(3);
+	aval = RS485DataAvailable();
+	RS485Read(buffer);
+
+	if (aval>0) {
+		strReceive = ByteArrayToStr(buffer);
+   	if(strcmp(strReceive,"!!!")==0) ping = true;
+	}
+	return ping;
+}
+
+/*! Change communication speed with the device
+Allowed values are 9600, 14400, 19200, 38400, 57600, 115200 and 230400.
+*/
+void WIFI_SetBaudRate(long baud) {
+	string b = NumToStr(baud);
+	//TextOut(0,LCD_LINE8,b);
+	string out = StrCat("$SCB2?",b);
+	RS485Send(out);
+}
+
+/*! Ping device 
+\returns true if device responded to ping
+*/
+bool WIFI_Ping() {
+	RS485Send("$???");
+ 	waitData(200);
+	if(strcmp(_instr,"!!!")==0) return true;
+	else return false;
+}
+
+
+/*! Return human readable baud rate, given the NXC BaudRate constant
+*/
+int DecodeBaudRate(int code) {
+	switch(code) {
+		case HS_BAUD_1200: return 1200;
+		case HS_BAUD_2400: return 2400;
+		case HS_BAUD_3600: return 3600;
+		case HS_BAUD_4800: return 4800;
+		case HS_BAUD_7200: return 7200;
+		case HS_BAUD_9600: return 9600;
+		case HS_BAUD_14400: return 14400;
+		case HS_BAUD_19200: return 19200;
+		case HS_BAUD_28800: return 28800;
+		case HS_BAUD_38400: return 38400;
+		case HS_BAUD_57600: return 57600;
+		case HS_BAUD_76800: return 76800;
+		case HS_BAUD_115200: return 115200;
+		case HS_BAUD_230400: return 230400;
+	}
+	return 0;
+}
+
+/*! Autodetect connected device speed settings (scans all allowed speeds)
+*/
+int WIFI_ScanBaudRate() {
+	int i = HS_BAUD_9600; // 0
+	for (i = HS_BAUD_9600; i < HS_BAUD_460800; i++) {
+		TextOut(0, LCD_LINE2, "testing " );
+		ClearLine(LCD_LINE3);
+		NumOut(0, LCD_LINE3,DecodeBaudRate(i));
+		UseRS485();
+		SetHSDataMode(DATA_MODE_RAW);
+	   RS485Uart(i , HS_MODE_8N1);
+		Wait(300);
+		if(WIFI_Ping()) {
+			WIFI_InitX(i);
+			return i;
+		}
+	}
+	return -1;
+}
+
+
+/** @} */ // end of Utilities group
+
+#endif

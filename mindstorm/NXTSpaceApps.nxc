@@ -1,0 +1,231 @@
+
+#include "NXT2WIFI.nxc"
+
+#define turnright(s,t) \
+OnFwd(OUT_B, s);OnRev(OUT_C, s);Wait(t);
+#define turnleft(s,t) \
+OnRev(OUT_B, s);OnFwd(OUT_C, s);Wait(t);
+#define forward(s,t) OnFwd(OUT_BC, s);Wait(t);
+#define backward(s,t) OnRev(OUT_BC, s);Wait(t);
+#define left(s,t) OnFwd(OUT_B, s);Float(OUT_C);Wait(t);
+#define right(s,t) Float(OUT_B);OnFwd(OUT_C, s);Wait(t);
+#define up(s,t) OnRev(OUT_A, s);Wait(t);
+#define down(s,t) OnFwd(OUT_A, s);Wait(t);
+#define breakall(t) Off(OUT_ABC);Wait(t);
+
+byte sensorType[] = {1, 3, 2}; //Touch, color, ultrasonic
+
+// custom webserver stuff
+long oldTachoValue[3];
+byte sensorField[] = {0, 1, 2}; // id of webserver field where to show sensor data
+byte motorField[] = {3, 4, 5}; // id of webserver field where to show motor data
+byte batteryField = 6;
+int batteryCount = 0;
+
+
+// CUSTOM WI-FI PROFILE SETTINGS
+#define MY_ADHOC false
+#define MY_SSID "Cantine_RDC"
+#define MY_WPA2_KEY "d4d3a089b20d91ef62bd6045467556a9294355bf63e936e0bb0e952f31071f55"
+#define MY_WPA2_PASS "w1f1c4nt1n3"
+#define MY_DHCP true
+
+void CreateCustomWIFI() {
+	WIFI_SetAdHoc(MY_ADHOC);
+	WIFI_SetSSID(MY_SSID);
+	WIFI_SecurityWPA2Passphrase(MY_WPA2_PASS);
+	WIFI_EnableDHCP(MY_DHCP);
+	WIFI_Save();
+}
+
+// this function is called periodically to update web page content.
+void Web_Set() {
+// 0 : sensor 1 (touch)
+// 1 : sensor 2 (color)
+// 2 : sensor 3 (ultrasonic)
+// 3 : motor A rotationCount
+// 4 : motor B rotationCount
+// 5 : motor C rotationCount
+// 6 : batteryLevel
+// 7 : keepMotorsOn
+	int val = -1;
+	string strVal;
+	val = BatteryLevel();
+	strVal = NumToStr(val);
+
+// update battery level seldomly
+	if (batteryCount>50) {
+		WIFI_Web_UpdateLabel(batteryField, strVal, 0);
+		batteryCount = 0;
+	} else batteryCount++;
+
+	for (int s=0; s<3; s++) {
+		switch(sensorType[s]) {
+			case 0: // NONE
+				val = -1;
+				break;
+			case 1: // TOUCH
+				val = SensorRaw(s)<900;
+				break;
+			case 2: // ULTRASONIC
+				val = SensorUS(s);
+				break;
+			case 3: // COLOR FULL
+				val = SensorScaled(s); // color ID
+				break;
+			case 4: case 5: case 6: case 7: // COLOR SINGLE
+				val = SensorRaw(s);
+				break;
+		}
+		strVal = NumToStr(val);
+		if (sensorType[s]!=0) {
+			WIFI_Web_UpdateLabel(sensorField[s], strVal, 0);
+		}
+		int tachoNow = MotorRotationCount(s);
+		WIFI_Web_UpdateLabel(motorField[s], NumToStr(tachoNow), 0);
+	}
+	// flush the command replies
+	flushRS485();
+}
+
+// detect special "Webpage event" Direct Command
+// 0x00 0x80 0x14 <ID> <EVENT> <VALUE>
+// <ID> = 0...4 type of widget that generated the event
+// <EVENT> = 0...255 event
+// <VALUE> = 0...255 value of the widget
+
+// here you implement the behavior of the robot, for your custom webserver page
+void ManageWebEvent(byte buffer[]) {
+	byte ctrlType = buffer[3];
+	byte ctrlID = buffer[4];
+	byte event = buffer[5];
+	byte value = buffer[6];
+	TextOut(0,LCD_LINE3,"Web Event     ");
+	TextOut(0,LCD_LINE4, FormatNum("type: %d       ",ctrlType));
+	TextOut(0,LCD_LINE5, FormatNum("ID: %d        ",ctrlID));
+	TextOut(0,LCD_LINE6, FormatNum("val: %d       ",event));
+
+	if (ctrlType==WEB_CTRL_BTN){
+		switch(ctrlID) {
+			case 1: //  turnleft
+              if(event==0) turnleft(80,1000);  //80%,1s
+              if(event==1) {turnleft(80,2000);} //80%,2s
+              else {Off(OUT_BC);} //event ==2 release
+              break;
+			case 2: //   forward
+              if(event==0) forward(80,1000);  //80%,1s
+              if(event==1) {forward(80,2000);} //80%,2s
+              else {Off(OUT_BC);} //event ==2 release
+              break;
+			case 3: //   turnright
+              if(event==0) turnright(80,1000);  //80%,1s
+              if(event==1) {turnright(80,2000);} //80%,2s
+              else {Off(OUT_BC);} //event ==2 release
+              break;
+			case 4: //   left
+              if(event==0) left(80,1000);  //80%,1s
+              if(event==1) {left(80,2000);} //80%,2s
+              else {Off(OUT_BC);} //event ==2 release
+              break;
+
+			case 5: //   break all
+              breakall(1000);  //break,1s
+              break;
+			case 6: //   right
+              if(event==0) right(80,1000);  //80%,1s
+              if(event==1) {right(80,2000);} //80%,2s
+              else {Off(OUT_BC);} //event ==2 release
+              break;
+			case 7: //   up
+              if(event==0) {up(30,500);}  //30%,.5s
+              else {Off(OUT_A);} //event ==2 release
+              break;
+			case 8: //   backward
+              if(event==0) backward(80,1000);  //80%,1s
+              if(event==1) {backward(80,2000);} //80%,2s
+              else {Off(OUT_BC);} //event ==2 release
+              break;
+			case 9: //   down
+              if(event==0) {down(30,500);}  //30%,.5s
+              else {Off(OUT_A);} //event ==2 release
+              break;
+      } //switch
+ 	} //WEB_CTRL_BTN
+ 	if (ctrlType==WEB_CTRL_CHK){
+     if(ctrlID==200){  // twitt
+     if (event==0){  // No twitt
+     }
+     if (event==1){  // Twitt
+     }
+  }
+ 	
+ 	}//WEB_CTRL_CHK
+}
+
+/* *******************************************************
+ * Main routine
+ * ******************************************************* */
+
+#define CONN_CHECK_T 20000 // period for checking connection status
+#define UPDATE_TIMEOUT 1000 // period for sending values to webpage
+
+task main()
+{
+	bool connected = false;
+	long connCheckTimer;
+	long updateTimer;
+	byte buffer[100];
+	int aval = 0;
+  //Sensor initilization
+	SetSensorTouch(IN_1);
+	SetSensorColorNone(IN_2);// light can be changed (None,Full,Red,Green,Blue)
+	SetSensorLowspeed(IN_3);
+
+  while(true) {
+     ClearScreen();
+	   TextOut(0, LCD_LINE1, "NXTSpaceApps" );
+     TextOut(0, LCD_LINE2, "Go!" );
+     //WIFI initialization
+     WIFI_Init();
+     //If your parameters change, force the settings
+     TextOut(0, LCD_LINE4, "Force WIFI??" );
+     TextOut(0, LCD_LINE5, "Press Square" );
+     Wait(1000);
+     if (ButtonPressed(BTNCENTER,true)) CreateCustomWIFI();
+     //NXT2WIFI to WIFI connection stuff
+     if (!WIFI_Connected()) {
+     		if ( !WIFI_CustomExist()) {
+       			CreateCustomWIFI();
+	     	}
+	     	Wait(100);
+	     	WIFI_Connect(true);
+        TextOut(0, LCD_LINE4, "Wait connection" );
+      	while(!WIFI_Connected()) Wait(1000);
+        TextOut(0, LCD_LINE4, "Connected!" );
+     }
+     Wait(100);
+     string ip = WIFI_GetCurrentIP();
+     ClearLine(LCD_LINE4);
+     ClearLine(LCD_LINE5);
+     TextOut(0, LCD_LINE5,ip);
+     //Communications with the webserver
+     connCheckTimer = CurrentTick();
+		 updateTimer = CurrentTick();
+	   connected = WIFI_Connected();
+		 while(connected) {
+			  aval = waitRS485Data(buffer,UPDATE_TIMEOUT); // timeout = 0 means blocking call
+			  if ( aval!=0 && IsWebEvent(buffer) ) {
+				   ManageWebEvent(buffer);
+    		} else {
+				if ((CurrentTick()-connCheckTimer)>CONN_CHECK_T) {
+					 connected = WIFI_Connected();
+					 connCheckTimer =CurrentTick();
+				}
+				if ((CurrentTick()-updateTimer)>UPDATE_TIMEOUT || ButtonPressed(BTNCENTER,true)) {
+					 updateTimer =CurrentTick();
+					 if (connected)	Web_Set();
+				}
+			}
+		} // while(connected)
+	} // while(true)
+}

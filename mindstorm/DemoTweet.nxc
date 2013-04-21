@@ -1,0 +1,128 @@
+#ifndef ___TWEET_NXC
+#define ___TWEET_NXC
+
+#include "NXT2WIFI.nxc"
+
+// tweet using ThingTweet
+// get your API key and paste it here
+#define API_KEY "1X0F3QABWDLT5C60"
+#define THINGTWEET_IP "184.106.153.149"
+
+// tweet using Arduino Tweet
+// get your token and paste it here
+#define TOKEN "1320773815-JyI3Z2kfCK7StwhhZfecUSbbtP5kqxFkdQDdjVL"
+#define ARDUINOTWEET_DOMAIN "arduino-tweet.appspot.com"
+
+#define TCP_SOCKET 1
+#define PORT 80
+
+#define W Wait(30)
+
+// CUSTOM WI-FI PROFILE SETTINGS
+
+#define MY_ADHOC false
+#define MY_SSID "Cantine_RDC"
+#define MY_WPA2_PASS "w1f1c4nt1n3"
+#define MY_DHCP true
+
+void CreateCustomWIFI() {
+	WIFI_SetAdHoc(AD_HOC);
+	WIFI_SetSSID(MY_SSID);
+	WIFI_SecurityWPA2Passphrase(MY_WPA2_PASS);
+	WIFI_EnableDHCP(MY_DHCP);
+	WIFI_Save();
+}
+
+bool WIFI_InitTwitter(string ip) {
+	return WIFI_TCPOpenClient(TCP_SOCKET, ip, PORT);
+}
+
+bool WIFI_CloseTwitter() {
+	return WIFI_TCPClose(TCP_SOCKET);
+}
+
+bool WIFI_ThingTweet(string msg) {
+    // Create HTTP POST Data
+	WIFI_CloseTwitter();
+	Wait(300);
+	if (!WIFI_InitTwitter(THINGTWEET_IP)) return false;
+	Wait(300);
+	string out = "";
+	int len = StrLen(msg)+StrLen(API_KEY)+16;
+	string lenStr = NumToStr(len);
+	WIFI_TCPWrite(TCP_SOCKET,"POST /apps/thingtweet/1/statuses/update HTTP/1.1\n");
+	W;
+	WIFI_TCPWrite(TCP_SOCKET,"Host: api.thingspeak.com\n");
+	W;
+	WIFI_TCPWrite(TCP_SOCKET,"Connection: close\n");
+	W;
+	WIFI_TCPWrite(TCP_SOCKET,"Content-Type: application/x-www-form-urlencoded\n");
+	W;
+	out = StrCat("Content-Length: ",lenStr,"\n\r\n");
+   WIFI_TCPWrite(TCP_SOCKET,out);
+	W;
+	out = StrCat("api_key=",API_KEY,"&status=");
+   WIFI_TCPWrite(TCP_SOCKET,out);
+	W;
+   WIFI_TCPWrite(TCP_SOCKET,msg);
+	W;
+	return true;
+}
+
+bool WIFI_ArduinoTweet(string msg) {
+    // Create HTTP POST Data
+	WIFI_CloseTwitter();
+	Wait(300);
+	if (!WIFI_InitTwitter(ARDUINOTWEET_DOMAIN)) return false;
+	Wait(300);
+	string out = "";
+	int len = StrLen(msg)+StrLen(TOKEN)+14;
+	string lenStr = NumToStr(len);
+	WIFI_TCPWrite(TCP_SOCKET,"POST arduino-tweet.appspot.com/update HTTP/1.0\n");
+ 	W;
+	out = StrCat("Content-Length: ",lenStr,"\r\n\r\n");
+	WIFI_TCPWrite(TCP_SOCKET,out);
+	W;
+	out = StrCat("token=",TOKEN,"&status=");
+	WIFI_TCPWrite(TCP_SOCKET,out);
+	W;
+	WIFI_TCPWrite(TCP_SOCKET,msg);
+	W;
+	out = "";
+	WIFI_TCPRead(TCP_SOCKET,20,out);
+// now parse response and look for the status code (should be 200)
+	W;
+	return true;
+}
+
+task main() {
+  ClearScreen();
+  TextOut(0, LCD_LINE1, "Danny's NXT2WIFI" );
+  TextOut(0, LCD_LINE2, "Tweet!" );
+  WIFI_Init();
+  if (!WIFI_Connected()) {
+		if ( !WIFI_CustomExist()) {
+			CreateCustomWIFI();
+		}
+		Wait(100);
+		WIFI_Connect(true);
+   	TextOut(0, LCD_LINE3, "Wait connection" );
+		while(!WIFI_Connected())Wait(1000);
+   	TextOut(0, LCD_LINE3, "Connected!" );
+	}
+	Wait(100);
+
+	//string time = WIFI_GetDateTime(2);
+	WIFI_ArduinoTweet("#NXTSpaceApps is twitting using #NXT2WIFI and arduino-tweet.appspot.com!");
+	//WIFI_ArduinoTweet(time);
+	PlayTone(2000,10);
+	
+	Wait(1000);
+	
+	//time = WIFI_GetDateTime(2);
+	WIFI_ThingTweet("#NXTSpaceApps is twitting using #NXT2WIFI and thingspeak.com");
+	//WIFI_ThingTweet(time);
+	PlayTone(2000,10);
+}
+
+#endif

@@ -1,0 +1,136 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<title>NXT2WIFI Activation Page</title>
+
+<script src="scripts/mchp.min.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+// check if string is composed by hex symbols only
+function CheckHEX(hex)
+{
+	hex_char = "0123456789ABCDEF";
+	hex = hex.toUpperCase();
+	var i;
+
+	for(i = 0; i < hex.length; i++)
+	{
+		if(hex_char.indexOf(hex.charAt(i)) < 0)
+			return false;
+	}
+	
+	return true;
+}
+
+function Submit() {
+	code = document.getElementById("CODE").value;
+	if (code.length!=40) {
+		alert("Error: code must be 40 characters long!");
+		return false;
+	}
+	if (!CheckHEX(code)) {
+		alert("Error: code should be composed by hex numbers!");
+		return false;
+	}
+	return true;
+}
+
+function updateStatus(xmlData) {
+	if(!xmlData)
+	{
+		return;
+	}
+	
+	var macString = getXMLValue(xmlData, 'mac');
+	document.getElementById("MAC").innerHTML = macString;
+	document.getElementById("MAC").style.fontFamily='Trebuchet MS';
+		
+	var activated = getXMLValue(xmlData, 'active');
+	if (activated ==1) {
+		document.getElementById("STATUS").style.color = '#008800'; // GREEN
+		document.getElementById("STATUS").innerHTML = 'ACTIVATED';
+		document.getElementById("SUBMIT").style.display = "none";
+		document.getElementById("CODE").style.display = "none";
+		document.getElementById("CODE_LABEL").style.display = "none";
+	} else {
+		document.getElementById("STATUS").style.color = '#FF0000'; // RED
+		document.getElementById("STATUS").innerHTML = 'NOT ACTIVATED';
+	}	
+}
+
+window.onload = updateStatus;
+setTimeout("newAJAXCommand('activation.xml', updateStatus, true)",500);
+</script>
+
+
+</head>
+
+<body>
+<div id="content">
+	<div id="logo" align="center"><img src="images/header.gif" alt="NXT2WIFI" /> </div>
+	
+	<div id="data" align=center>
+		<table border="0">
+			<tr>
+				<table style="-moz-border-radius: 25px; border-radius: 25px; border-collapse: collapse" width="470px" cellpadding="0" bgcolor="#C0C0C0">
+				<tr>
+					<td>
+					&nbsp;</td>
+				</tr>
+				<tr>
+				<td align="center">
+					<form id="activation"  method="post" style="font-family: 'Verdana'">
+					<b>
+					NXT2WIFI ACTIVATION FORM
+						</b>
+						<table>
+							<tr>
+								<td colspan=2>
+								&nbsp;
+								</td>
+							</tr>
+							<tr>
+								<td style="font-weight: bold;" align="center">
+								MAC address:
+								</td>
+								<td align="center">
+									<span id="MAC">
+									XX-XX-XX-XX-XX-XX
+									</span>
+								</td>
+							</tr>
+
+							<tr>
+								<td style="font-weight: bold;">
+								<span id="CODE_LABEL">Enter code:</span>
+								</td>
+								<td><input type="text" style="width: 300px;" id="CODE" name="CODE" maxlength="40"/></td>
+							</tr>
+							
+							<tr>
+								<td style="font-weight: bold;">
+								Status:
+								</td>
+								<td>
+									<p align="center"><b>
+									<font color="#FF0000" size="2">
+									<span id="STATUS">NOT ACTIVATED</span></font></b>
+								</td>
+							</tr>							
+						</table>
+
+						<div class="action" style="text-align: right;">
+							<p style="text-align: center">
+							<font face="Verdana">
+							<input id="SUBMIT" type="submit" style="margin-right: 10px;" value="Submit" onclick="return Submit();" /></font>
+						</div>
+					</form>
+					</td>
+					</tr>
+				</table>
+			</tr>
+		</table>
+	</div>
+</body>
+</html>

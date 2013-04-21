@@ -1,0 +1,636 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title></title>
+<link rel="stylesheet" href="jquery-ui-1.8.21.custom.css" type="text/css" media="all" />
+<link rel="stylesheet" href="content.css" type="text/css" media="all" />
+<script type="text/javascript" src="jquery-1.5.min.js"></script>
+<script type="text/javascript" src="jquery-ui-1.8.21.custom.min.js"></script>
+<script type="text/javascript" src="json2.min.js"></script>
+<script type="text/javascript" src="lib.min.js"></script>
+<script type="text/javascript" src="jstorage.js"></script>
+<script type='text/javascript'>
+var obj=/*ScriptContentStart*/[
+/* boutons */
+  {
+    "idn": 0,
+    "id": "global_0",
+    "type": "global",
+    "refresh": "200",
+    "background": "#FFF",
+    "width":"700px"
+  },
+  {
+    "idn": 1,
+    "id": "i1",
+    "type": "btn",
+    "index": 1,
+    "class": "openpicus_btn_1",
+    "typeclass": "openpicus_btn",
+    "editorclass": "openpicus_btn openpicus_btn_1 mceItemVisualAid mceItemLayer mceNonEditable",
+    "canSendEvents": true,
+    "link": "",
+    "img_on": "",
+    "img_off": "",
+    "text_on": "",
+    "text_off": "",
+    "text_style": "",
+    "text_position": "center",
+    "noborder": false
+  },
+  {
+    "idn": 2,
+    "id": "i2",
+    "type": "btn",
+    "index": 2,
+    "class": "openpicus_btn_2",
+    "typeclass": "openpicus_btn",
+    "editorclass": "openpicus_btn openpicus_btn_1 mceItemVisualAid mceItemLayer mceNonEditable",
+    "canSendEvents": true,
+    "link": "",
+    "img_on": "",
+    "img_off": "",
+    "text_on": "",
+    "text_off": "",
+    "text_style": "",
+    "text_position": "center",
+    "noborder": false
+  },
+  {
+    "idn": 3,
+    "id": "i3",
+    "type": "btn",
+    "index": 4,
+    "class": "openpicus_btn_3",
+    "typeclass": "openpicus_btn",
+    "editorclass": "openpicus_btn openpicus_btn_1 mceItemVisualAid mceItemLayer mceNonEditable",
+    "canSendEvents": true,
+    "link": "",
+    "img_on": "",
+    "img_off": "",
+    "text_on": "",
+    "text_off": "",
+    "text_style": "",
+    "text_position": "center",
+    "noborder": false
+  },
+  {
+    "idn": 4,
+    "id": "i4",
+    "type": "btn",
+    "index": 5,
+    "class": "openpicus_btn_4",
+    "typeclass": "openpicus_btn",
+    "editorclass": "openpicus_btn openpicus_btn_1 mceItemVisualAid mceItemLayer mceNonEditable",
+    "canSendEvents": true,
+    "link": "",
+    "img_on": "",
+    "img_off": "",
+    "text_on": "",
+    "text_off": "",
+    "text_style": "",
+    "text_position": "center",
+    "noborder": false
+  },
+  {
+    "idn": 5,
+    "id": "i5",
+    "type": "btn",
+    "index": 5,
+    "class": "openpicus_btn_5",
+    "typeclass": "openpicus_btn",
+    "editorclass": "openpicus_btn openpicus_btn_1 mceItemVisualAid mceItemLayer mceNonEditable",
+    "canSendEvents": true,
+    "link": "",
+    "img_on": "",
+    "img_off": "",
+    "text_on": "",
+    "text_off": "",
+    "text_style": "",
+    "text_position": "center",
+    "noborder": false
+  },
+  {
+    "idn": 6,
+    "id": "i6",
+    "type": "btn",
+    "index": 6,
+    "class": "openpicus_btn_6",
+    "typeclass": "openpicus_btn",
+    "editorclass": "openpicus_btn openpicus_btn_1 mceItemVisualAid mceItemLayer mceNonEditable",
+    "canSendEvents": true,
+    "link": "",
+    "img_on": "",
+    "img_off": "",
+    "text_on": "",
+    "text_off": "",
+    "text_style": "",
+    "text_position": "center",
+    "noborder": false
+  },
+  {
+    "idn": 7,
+    "id": "i7",
+    "type": "btn",
+    "index": 7,
+    "class": "openpicus_btn_7",
+    "typeclass": "openpicus_btn",
+    "editorclass": "openpicus_btn openpicus_btn_1 mceItemVisualAid mceItemLayer mceNonEditable",
+    "canSendEvents": true,
+    "link": "",
+    "img_on": "",
+    "img_off": "",
+    "text_on": "",
+    "text_off": "",
+    "text_style": "",
+    "text_position": "center",
+    "noborder": false
+  },
+  {
+    "idn": 8,
+    "id": "i8",
+    "type": "btn",
+    "index": 8,
+    "class": "openpicus_btn_8",
+    "typeclass": "openpicus_btn",
+    "editorclass": "openpicus_btn openpicus_btn_1 mceItemVisualAid mceItemLayer mceNonEditable",
+    "canSendEvents": true,
+    "link": "",
+    "img_on": "",
+    "img_off": "",
+    "text_on": "",
+    "text_off": "",
+    "text_style": "",
+    "text_position": "center",
+    "noborder": false
+  },
+  {
+    "idn": 9,
+    "id": "i9",
+    "type": "btn",
+    "index": 9,
+    "class": "openpicus_btn_9",
+    "typeclass": "openpicus_btn",
+    "editorclass": "openpicus_btn openpicus_btn_1 mceItemVisualAid mceItemLayer mceNonEditable",
+    "canSendEvents": true,
+    "link": "",
+    "img_on": "",
+    "img_off": "",
+    "text_on": "",
+    "text_off": "",
+    "text_style": "",
+    "text_position": "center",
+    "noborder": false
+  },
+  {
+    "idn": 11,
+    "id": "i11",
+    "type": "btn",
+    "index": 11,
+    "class": "openpicus_btn_11",
+    "typeclass": "openpicus_btn",
+    "editorclass": "openpicus_btn openpicus_btn_11 mceItemVisualAid mceItemLayer mceNonEditable",
+    "canSendEvents": true,
+    "link": "",
+    "img_on": "",
+    "img_off": "",
+    "text_on": "",
+    "text_off": "",
+    "text_style": "",
+    "text_position": "center",
+    "noborder": false
+  },
+  {
+    "idn": 12,
+    "id": "i12",
+    "type": "btn",
+    "index": 12,
+    "class": "openpicus_btn_12",
+    "typeclass": "openpicus_btn",
+    "editorclass": "openpicus_btn openpicus_btn_12 mceItemVisualAid mceItemLayer mceNonEditable",
+    "canSendEvents": false,
+    "link": "",
+    "img_on": "",
+    "img_off": "",
+    "text_on": "",
+    "text_off": "",
+    "text_style": "",
+    "text_position": "center",
+    "noborder": false
+  },
+/* Slide bars */
+  {
+    "idn": 16,
+    "id": "i16",
+    "type": "sld",
+    "index": 16,
+    "class": "openpicus_sld_16",
+    "typeclass": "openpicus_sld",
+    "editorclass": "openpicus_sld openpicus_sld_1 mceItemVisualAid mceItemLayer mceNonEditable",
+    "canSendEvents": false,
+    "continuousSend": false,
+    "scala_min": 0,
+    "scala_max": 255,
+    "step": 1
+  },
+  {
+    "idn": 13,
+    "id": "i13",
+    "type": "sld",
+    "index": 13,
+    "class": "openpicus_sld_13",
+    "typeclass": "openpicus_sld",
+    "editorclass": "openpicus_sld openpicus_sld_1 mceItemVisualAid mceItemLayer mceNonEditable",
+    "canSendEvents": true,
+    "continuousSend": false,
+    "scala_min": 0,
+    "scala_max": 10000,
+    "step": 1000
+  },
+  {
+    "idn": 14,
+    "id": "i14",
+    "type": "sld",
+    "index": 14,
+    "class": "openpicus_sld_14",
+    "editorclass": "openpicus_sld openpicus_sld_1 mceItemVisualAid mceItemLayer mceNonEditable",
+    "canSendEvents": true,
+    "continuousSend": false,
+    "scala_min": 0,
+    "scala_max": 100,
+    "step": 1
+  },
+  {
+    "idn": 15,
+    "id": "i15",
+    "type": "sld",
+    "index": 15,
+    "class": "openpicus_sld_15",
+    "typeclass": "openpicus_sld",
+    "editorclass": "openpicus_sld openpicus_sld_1 mceItemVisualAid mceItemLayer mceNonEditable",
+    "canSendEvents": true,
+    "continuousSend": false,
+    "scala_min": 0,
+    "scala_max": 100,
+    "step": 1
+  },
+
+/* Check Box */
+  {
+    "idn": 200,
+    "id": "i_tweet",
+    "type": "chk",
+    "index": 200,
+    "class": "openpicus_chk_20",
+    "typeclass": "openpicus_chk",
+    "editorclass": "openpicus_chk openpicus_chk_20 mceItemVisualAid mceItemLayer mceNonEditable",
+    "canSendEvents": true,
+    "text": "Checkbox 0",
+    "checked": false
+  },
+  {
+    "idn": 17,
+    "id": "i17",
+    "type": "chk",
+    "index": 17,
+    "class": "openpicus_chk_21",
+    "typeclass": "openpicus_chk",
+    "editorclass": "openpicus_chk openpicus_chk_21 mceItemVisualAid mceItemLayer mceNonEditable",
+    "canSendEvents": true,
+    "text": "Checkbox 0",
+    "checked": false
+  },
+  {
+    "idn": 18,
+    "id": "i18",
+    "type": "chk",
+    "index": 18,
+    "class": "openpicus_chk_18",
+    "typeclass": "openpicus_chk",
+    "editorclass": "openpicus_chk openpicus_chk_18 mceItemVisualAid mceItemLayer mceNonEditable",
+    "canSendEvents": true,
+    "text": "Checkbox 0",
+    "checked": false
+  },
+  {
+    "idn": 19,
+    "id": "i19",
+    "type": "chk",
+    "index": 19,
+    "class": "openpicus_chk_19",
+    "typeclass": "openpicus_chk",
+    "editorclass": "openpicus_chk openpicus_chk_19 mceItemVisualAid mceItemLayer mceNonEditable",
+    "canSendEvents": true,
+    "text": "Checkbox 0",
+    "checked": false
+  },
+
+/* Labels */
+{
+    "idn": 301,
+    "id": "lbl_mvmt",
+    "type": "label",
+    "index": 301,
+    "class": "openpicus_label_mvmt",
+    "typeclass": "openpicus_label",
+    "editorclass": "openpicus_label openpicus_label_mvmt mceItemVisualAid mceItemLayer mceNonEditable"
+  },
+{
+    "idn": 302,
+    "id": "lbl_seuil",
+    "type": "label",
+    "index": 302,
+    "class": "openpicus_label_seuil",
+    "typeclass": "openpicus_label",
+    "editorclass": "openpicus_label openpicus_label_seuil mceItemVisualAid mceItemLayer mceNonEditable"
+  },
+{
+    "idn": 303,
+    "id": "lbl_delay",
+    "type": "label",
+    "index": 303,
+    "class": "openpicus_label_delay",
+    "typeclass": "openpicus_label",
+    "editorclass": "openpicus_label openpicus_label_delay mceItemVisualAid mceItemLayer mceNonEditable"
+  },
+{
+    "idn": 304,
+    "id": "lbl_son",
+    "type": "label",
+    "index": 304,
+    "class": "openpicus_label_son",
+    "typeclass": "openpicus_label",
+    "editorclass": "openpicus_label openpicus_label_son mceItemVisualAid mceItemLayer mceNonEditable"
+  },
+{
+    "idn": 305,
+    "id": "lbl_couleur",
+    "type": "label",
+    "index": 305,
+    "class": "openpicus_label_5",
+    "typeclass": "openpicus_label",
+    "editorclass": "openpicus_label openpicus_label_couleur mceItemVisualAid mceItemLayer mceNonEditable"
+  },
+{
+    "idn": 306,
+    "id": "lbl_touche",
+    "type": "label",
+    "index": 306,
+    "class": "openpicus_label_touche",
+    "typeclass": "openpicus_label",
+    "editorclass": "openpicus_label openpicus_label_touche mceItemVisualAid mceItemLayer mceNonEditable"
+  },
+
+]/*ScriptContentEnd*/;
+</script>
+</head>
+
+
+
+<body>
+<div id="loading" style="display:none">Error:<br />Connection to Flyport control board was lost.</div>
+
+<div id="page" >
+<!--HtmlContentStart-->
+
+<div id="entete">
+<h1>Lego Rover Control Center
+<img src="img/NASA.svg" height="39" class="right"> </img>
+</h1>
+</div><!-- fin tete -->
+
+<div id="tweet">
+<div id="tweet_txt">
+<b>Last tweet from mars :</b> 
+</div>
+<div id="tweet_content">
+@NXTSpaceApps : #OMG! There's a #cat playing with a box! 
+</div>
+<div id="i_tweet" class="openpicus_chk openpicus_chk_23 mceNonEditable">
+Enable tweets
+</div>
+
+</div>
+<div id="corps">
+	<div id="bloc_output"> <!-- start output bloc -->
+<!--
+<div class="bloc_title bloc_title_top">
+Output panel
+</div>
+-->
+<div class="bloc_content bloc_content_top">
+<TABLE BORDER="0"> 
+<TR>
+	<TH> 
+		Touch sensor
+	</TH>
+	<TD>  
+		<div id="lbl_touche" class="openpicus_label openpicus_label_touche mceNonEditable" 
+		style="width: 64px; height: 12px;"><span class="label_content">Label 0</span>
+		</div>
+	</TD>
+</TR> 
+<TR>
+	<TH> 
+		Color sensor
+	</TH>
+	<TD id="fullColorBtn">
+	</TD>
+</TR> 
+<TR>
+	<TH> 
+		Ultra-sound sensor
+	</TH>
+	<TD class="bargraph">  
+		<!--bargraph-->
+		<div id="i16" class="openpicus_sld openpicus_sld_1 mceNonEditable">&nbsp;
+		</div>
+	</TD>
+</TR> 
+</TABLE> 
+
+	<!-- end output bloc -->
+	</div>
+</div>	
+	<div id="bloc_input">
+	<!-- start input bloc-->
+	<div id="bloc_input_left"> <!-- start bloc input left -->
+
+<div class="bloc_title bloc_title_bottom">
+Control panel
+</div>
+<div class="bloc_content bloc_content_bottom">
+<TABLE BORDER="0"> 
+<TR> 
+	<TD>
+		<!-- bouton 1 -->
+		<div id="i1" class="openpicus_btn openpicus_btn_1 mceNonEditable">&nbsp;
+		</div>
+	</TD> 
+	<TD> 
+		<!-- bouton 2 -->
+		<div id="i2" class="openpicus_btn openpicus_btn_1 mceNonEditable">&nbsp;
+		</div>
+	</TD> 
+ 	<TD> 
+		<!-- bouton 3 -->
+		<div id="i3" class="openpicus_btn openpicus_btn_1 mceNonEditable">&nbsp;
+
+</TR> 
+<TR> 
+ 	<TD>
+		<!-- bouton 4 -->
+		<div id="i4" class="openpicus_btn openpicus_btn_1 mceNonEditable">&nbsp;
+		</div>
+	</TD> 
+ 	<TD> 
+		<!-- bouton 5 -->
+		<div id="i5" class="openpicus_btn openpicus_btn_1 mceNonEditable">&nbsp;
+		</div>	
+	</TD> 
+	<TD> 
+		<!-- bouton 6 -->
+		<div id="i6" class="openpicus_btn openpicus_btn_1 mceNonEditable">&nbsp;
+		</div>
+	</TD> 
+</TR> 
+<TR> 
+	<TD>
+		<!-- bouton 7 -->
+		<div id="i7" class="openpicus_btn openpicus_btn_1 mceNonEditable">&nbsp;
+		</div>
+	</TD> 
+	<TD> 
+		<!-- bouton 8 -->
+		<div id="i8" class="openpicus_btn openpicus_btn_1 mceNonEditable">&nbsp;
+		</div>
+	</TD> 
+ 	<TD> 
+		<!-- bouton 9 -->
+		<div id="i9" class="openpicus_btn openpicus_btn_1 mceNonEditable">&nbsp;
+
+</TR> 
+</TABLE> 
+
+</div> <!-- end bloc output left -->
+</div>
+
+<div id="bloc_input_right"> <!-- start bloc input right-->
+
+<div class="bloc_title bloc_title_bottom">
+ Settings panel
+</div>
+
+<div class="bloc_content bloc_content_bottom">
+
+<TABLE BORDER="0"> 
+
+<TR>
+	<TH> 
+		Latency
+	</TH>
+	<TD class="bargraph">  
+		<!--bargraph-->
+		<div id="i13" class="openpicus_sld openpicus_sld_1 mceNonEditable">&nbsp;
+		</div>
+	</TD>
+	<TD>  
+		<div id="lbl_delay" class="openpicus_label openpicus_label_delay mceNonEditable" 
+		style="width: 64px; height: 12px;"><span class="label_content">10s</span>
+		</div>
+	</TD>
+</TR> 
+
+<TR>
+	<TH> 
+		Threeshold
+	</TH>
+	<TD class="bargraph">  
+		<!--bargraph-->
+		<div id="i14" class="openpicus_sld openpicus_sld_1 mceNonEditable">&nbsp;
+		</div>
+	</TD>
+	<TD>  
+		<div id="lbl_seuil" 
+		class="openpicus_label openpicus_label_seuil mceNonEditable" 
+		style="width: 64px; height: 12px;"><span class="label_content">10%</span>
+	</div>
+	</TD>
+</TR> 
+
+<TR>
+	<TH> 
+		Rotation Angle	
+	</TH>
+	<TD class="bargraph">  
+		<!--bargraph-->
+		<div id="i15" class="openpicus_sld openpicus_sld_1 mceNonEditable">&nbsp;
+		</div>
+	</TD>
+	<TD>  
+		<div id="lbl_mvmt" class="openpicus_label openpicus_label_mvmt mceNonEditable" 
+		style="width: 64px; height: 12px;"><span class="label_content">90deg</span>
+		</div>
+	</TD>
+</TR> 
+</TABLE> 
+
+<br>
+<b>Detection of obstacle :</b>
+<br>
+<TABLE>
+<TR>
+	<TD>
+	Strategy if detected:
+	<TD>
+	<TD>
+	Detection test:
+	</TD>
+</TR>
+<TR>
+	<TD>
+		<ul> 
+		<li style="list-style-type:none;">  
+		<div id="i17" class="openpicus_chk openpicus_chk_21 mceNonEditable" 
+		style="width: 150px; height: 15px;">
+		Stop
+		</div>
+		</li>
+		<li style="list-style-type:none;"> 
+		<div id="i18" class="openpicus_chk openpicus_chk_22 mceNonEditable" 
+		style="width: 150px; height: 15px;">
+		Rotate and Move
+		</div>
+		</li>
+		</ul> 
+	</TD>
+	<TD>
+	<TD>
+		<ul> 
+		<li style="list-style-type:none;">  
+		<div id="i19" class="openpicus_chk openpicus_chk_23 mceNonEditable" 
+		style="width: 150px; height: 15px;">
+		Enabled
+		</div>
+		</li>
+		</ul> 
+		
+	</TD>
+</TR>
+</TABLE>
+
+</div>
+</div> <!-- bloc content -->
+</div> <!-- end input bloc right-->
+</div> <!-- end input bloc -->
+</div> <!-- fin corps -->
+<!--HtmlContentEnd-->
+</div>
+<script type='text/javascript'>
+$(document).ready(function () {
+    ClientLoad(obj);
+});
+</script>
+
+</body>
+</html>
