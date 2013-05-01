@@ -219,6 +219,7 @@ var obj=/*ScriptContentStart*/[
     "noborder": false
   },
 /* Slide bars */
+/* time latency*/
   {
     "idn": 13,
     "id": "i13",
@@ -231,8 +232,10 @@ var obj=/*ScriptContentStart*/[
     "continuousSend": false,
     "scala_min": 0,
     "scala_max": 10000,
-    "step": 1000
+    "step": 1000,
+    "value": 5000
   },
+/* threshold */
   {
     "idn": 14,
     "id": "i14",
@@ -243,9 +246,11 @@ var obj=/*ScriptContentStart*/[
     "canSendEvents": true,
     "continuousSend": false,
     "scala_min": 0,
-    "scala_max": 100,
-    "step": 1
+    "scala_max": 255,
+    "step": 1,
+    "value": 40
   },
+/* Rotation angle */
   {
     "idn": 15,
     "id": "i15",
@@ -258,8 +263,10 @@ var obj=/*ScriptContentStart*/[
     "continuousSend": false,
     "scala_min": 0,
     "scala_max": 100,
-    "step": 1
+    "step": 5,
+    "value": 90
   },
+/* Output ultrasound-sensor */
   {
     "idn": 16,
     "id": "i16",
@@ -288,6 +295,7 @@ var obj=/*ScriptContentStart*/[
     "text": "Checkbox 0",
     "checked": false
   },
+/* if ultra sound value is...*/
   {
     "idn": 17,
     "id": "i17",
@@ -300,6 +308,7 @@ var obj=/*ScriptContentStart*/[
     "text": "Checkbox 0",
     "checked": false
   },
+/* if contact sensor ...*/
   {
     "idn": 18,
     "id": "i18",
@@ -312,6 +321,7 @@ var obj=/*ScriptContentStart*/[
     "text": "Checkbox 0",
     "checked": false
   },
+/* then stop */
   {
     "idn": 19,
     "id": "i19",
@@ -324,6 +334,7 @@ var obj=/*ScriptContentStart*/[
     "text": "Checkbox 0",
     "checked": false
   },
+/* then move forward */
   {
     "idn": 20,
     "id": "i20",
@@ -336,6 +347,7 @@ var obj=/*ScriptContentStart*/[
     "text": "Checkbox 0",
     "checked": false
   },
+/* then rotate */
   {
     "idn": 21,
     "id": "i21",
@@ -348,6 +360,7 @@ var obj=/*ScriptContentStart*/[
     "text": "Checkbox 0",
     "checked": false
   },
+/* then move forward */
   {
     "idn": 22,
     "id": "i22",
@@ -458,13 +471,13 @@ Enable tweets
 				<div id="color_sensor"></div>
 				<div id="color_sensor_details">
 					<div class="ligne">
-						<div id="red"></div> 255/255
+						<div id="red"></div>
 					</div>
 					<div class="ligne">
-						<div id="green"></div> 0/255
+						<div id="green"></div>
 					</div>
 					<div class="ligne">
-						<div id="blue"></div> 0/255
+						<div id="blue"></div>
 					</div>
 				</div>
 			</div>
@@ -473,8 +486,8 @@ Enable tweets
 				Ultra-sound sensor
 			</div>
 			<div class="output_content">
-				<div id="i13" class="openpicus_sld openpicus_sld_1 mceNonEditable" style="display:inline-block; margin-left:10px;">&nbsp;
-				</div> 90%
+				<div id="i16" class="openpicus_sld openpicus_sld_1 mceNonEditable" style="display:inline-block; margin-left:10px;">&nbsp;
+				</div><span id="lbl16">255cm</span>
 			</div>
 		
 			<div class="output_title">
@@ -484,7 +497,7 @@ Enable tweets
 				Sensor value : 
 				<div id="lbl_touche" 
 					class="openpicus_label openpicus_label_touche mceNonEditable">
-					<span class="label_content">NO CONTACT (0)</span>
+					<span class="label_content">NO CONTACT</span>
 				</div>
 			</div>
 
@@ -538,8 +551,8 @@ Enable tweets
 		<div id="latency" class="bloc_content">
 			<div style="margin-top:10px;"></div>
 			Time latency :</br>
-			<div id="i14" class="openpicus_sld mceNonEditable">&nbsp;
-        	    	</div> 800ms
+			<div id="i13" class="openpicus_sld mceNonEditable">&nbsp;
+        	    	</div> <span id="lbl13">5sec</span>
 		</div><!--end bloc input left-->
 
 		<div id="bloc_input_if">
@@ -550,11 +563,11 @@ Enable tweets
 			<div class="bloc_content bloc_content_bottom">
 
 				<div id="i17" class="openpicus_chk mceNonEditable">
-				  The ultrasound sensor value is more than :
+				  The ultrasound sensor value is less than :
                 	        </div> 
 
-				<div id="i15" class="openpicus_sld mceNonEditable">&nbsp;
-                	        </div> 70%
+				<div id="i14" class="openpicus_sld mceNonEditable">&nbsp;
+                	        </div> <span id="lbl14">40cm</span>
 				<div style="margin-top:10px;"></div>
 				<div id="i18" class="openpicus_chk mceNonEditable">
 				  The contact sensor value is 1
@@ -576,8 +589,8 @@ Enable tweets
 			<div id="i21" class="openpicus_chk mceNonEditable">
 				Turn right with an angle of :
                         </div> 
-			<div id="i16" class="openpicus_sld mceNonEditable">&nbsp;
-                        </div> 90deg
+			<div id="i15" class="openpicus_sld mceNonEditable">&nbsp;
+                        </div> <span id="lbl15">90deg</span>
 			<div style="margin-top:10px;"></div>
 
 			<div id="i22" class="openpicus_chk mceNonEditable">

@@ -213,6 +213,7 @@ display:inline-block;
 {
 display:inline-block;
 margin-left:5px;
+margin-right:10px;
 }
 
 
@@ -409,6 +410,9 @@ padding-left:7px;
 {
 height: 12px
 }
+
+
+#lbl16
 
 /* CHECKBOXES */
 .openpicus_chk
