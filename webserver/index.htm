@@ -395,235 +395,163 @@ var obj=/*ScriptContentStart*/[
 
 <div id="entete">
 <h1>Lego Rover Control Center
-<img src="img/NASA.svg" height="39" class="right"> </img>
+<img src="img/NASA.png" height="39" class="right"> </img>
 </h1>
 </div><!-- fin tete -->
 
 <div id="tweet">
-<div id="tweet_txt">
+<div id="i_tweet" class="openpicus_chk mceNonEditable">
+Enable tweets
+</div>
+<div id="tweet_txt" class="tweet">
 <b>Last tweet from mars :</b> 
 </div>
-<div id="tweet_content">
+<div id="tweet_content" class="tweet">
 @NXTSpaceApps : #OMG! There's a #cat playing with a box! 
-</div>
-<div id="i_tweet" class="openpicus_chk openpicus_chk_23 mceNonEditable">
-Enable tweets
 </div>
 
 </div>
 <div id="corps">
-	<div id="bloc_output"> <!-- start output bloc -->
-<!--
-<div class="bloc_title bloc_title_top">
-Output panel
-</div>
--->
-<div class="bloc_content bloc_content_top">
-<TABLE BORDER="0"> 
-<TR>
-	<TH> 
-		Touch sensor
-	</TH>
-	<TD>  
-		<div id="lbl_touche" class="openpicus_label openpicus_label_touche mceNonEditable" 
-		style="width: 64px; height: 12px;"><span class="label_content">Label 0</span>
+	
+<div id="bloc_output" class="bloc_content"> <!-- start output bloc -->
+	<div id="sensors">
+		<div class="sensor" >
+			<img src="img/touch.png" width="40px" height="40px"></img>
 		</div>
-	</TD>
-</TR> 
-<TR>
-	<TH> 
-		Color sensor
-	</TH>
-	<TD id="fullColorBtn">
-	</TD>
-</TR> 
-<TR>
-	<TH> 
-		Ultra-sound sensor
-	</TH>
-	<TD class="bargraph">  
-		<!--bargraph-->
-		<div id="i16" class="openpicus_sld openpicus_sld_1 mceNonEditable">&nbsp;
+		<div id="color_sensor"></div>
+		<div class="sensor" >
+			<img src="img/signal.png" width="40px" height="40px"></img>
 		</div>
-	</TD>
-</TR> 
-</TABLE> 
-
-	<!-- end output bloc -->
+		<div id="ultrasounds_sensor">  
+			<div id="i16" class="openpicus_sld openpicus_sld_1 mceNonEditable">&nbsp;
+			</div>
+		</div>
 	</div>
-</div>	
-	<div id="bloc_input">
-	<!-- start input bloc-->
+</div>	<!-- end output bloc-->
+	
+
+<div id="bloc_input"> <!-- start input bloc-->
 	<div id="bloc_input_left"> <!-- start bloc input left -->
 
-<div class="bloc_title bloc_title_bottom">
-Control panel
-</div>
-<div class="bloc_content bloc_content_bottom">
-<TABLE BORDER="0"> 
-<TR> 
-	<TD>
-		<!-- bouton 1 -->
-		<div id="i1" class="openpicus_btn openpicus_btn_1 mceNonEditable">&nbsp;
+		<div class="bloc_title">
+			Controls
 		</div>
-	</TD> 
-	<TD> 
-		<!-- bouton 2 -->
-		<div id="i2" class="openpicus_btn openpicus_btn_1 mceNonEditable">&nbsp;
-		</div>
-	</TD> 
- 	<TD> 
-		<!-- bouton 3 -->
-		<div id="i3" class="openpicus_btn openpicus_btn_1 mceNonEditable">&nbsp;
 
-</TR> 
-<TR> 
- 	<TD>
-		<!-- bouton 4 -->
-		<div id="i4" class="openpicus_btn openpicus_btn_1 mceNonEditable">&nbsp;
+		<div class="bloc_content bloc_content_bottom">
+		<div class="ligne" style="margin-bottom:7px;">
+			<!-- bouton 1 -->
+			<div id="i1" class="openpicus_btn openpicus_btn_1 mceNonEditable">
+			&nbsp;</div>
+			<!-- bouton 2 -->
+			<div id="i2" class="openpicus_btn openpicus_btn_1 mceNonEditable">
+			&nbsp;</div>
+			<!-- bouton 3 -->
+			<div id="i3" class="openpicus_btn openpicus_btn_1 mceNonEditable">
+			&nbsp;</div>
+
 		</div>
-	</TD> 
- 	<TD> 
-		<!-- bouton 5 -->
-		<div id="i5" class="openpicus_btn openpicus_btn_1 mceNonEditable">&nbsp;
+
+		<div class="ligne" style="margin-bottom:7px;">
+			<!-- bouton 4 -->
+			<div id="i4" class="openpicus_btn openpicus_btn_1 mceNonEditable">
+			&nbsp;</div>
+			<!-- bouton 5 -->
+			<div id="i5" class="openpicus_btn openpicus_btn_1 mceNonEditable">
+			&nbsp;</div>	
+			<!-- bouton 6 -->
+			<div id="i6" class="openpicus_btn openpicus_btn_1 mceNonEditable">
+			&nbsp;</div>
+		</div>
+		<div class="ligne">
+			<!-- bouton 7 -->
+			<div id="i7" class="openpicus_btn openpicus_btn_1 mceNonEditable">
+			&nbsp;</div>
+			<!-- bouton 8 -->
+			<div id="i8" class="openpicus_btn openpicus_btn_1 mceNonEditable">
+			&nbsp;</div>
+			<!-- bouton 9 -->
+			<div id="i9" class="openpicus_btn openpicus_btn_1 mceNonEditable">
+			&nbsp;</div>
 		</div>	
-	</TD> 
-	<TD> 
-		<!-- bouton 6 -->
-		<div id="i6" class="openpicus_btn openpicus_btn_1 mceNonEditable">&nbsp;
+		</div> <!-- end bloc content bottom -->
+	</div><!--end bloc input left-->
+
+	<div id="bloc_input_middle">
+		<div class="bloc_title">
+			Sensors
 		</div>
-	</TD> 
-</TR> 
-<TR> 
-	<TD>
-		<!-- bouton 7 -->
-		<div id="i7" class="openpicus_btn openpicus_btn_1 mceNonEditable">&nbsp;
+		<div class="bloc_content bloc_content_bottom">
+		<div class="ligne">
+			<div id="time_delay" class="logo">
+				<img src="img/clock.png" height="100%"> </img>
+			</div>
+			<div class="control">
+				 <div id="i13" class="openpicus_sld mceNonEditable">
+                                &nbsp;
+                        	</div>
+			</div>	
+		</div>		
+		<div class="ligne">
+			<div class="logo">
+				<img src="img/signal.png" height="100%"> </img>
+			</div>
+			<div class="control">
+				<div id="i14" class="openpicus_sld mceNonEditable">&nbsp;
+                        	</div>
+			</div>	
+		</div>		
+		<div class="ligne">
+			<div class="logo">
+				<img src="img/rotate.png" height="100%"> </img>
+			</div>
+			<div class="control">
+				<div id="i15" class="openpicus_sld mceNonEditable">&nbsp;
+                        	</div>
+			</div>	
+		</div>		
 		</div>
-	</TD> 
-	<TD> 
-		<!-- bouton 8 -->
-		<div id="i8" class="openpicus_btn openpicus_btn_1 mceNonEditable">&nbsp;
-		</div>
-	</TD> 
- 	<TD> 
-		<!-- bouton 9 -->
-		<div id="i9" class="openpicus_btn openpicus_btn_1 mceNonEditable">&nbsp;
-
-</TR> 
-</TABLE> 
-
-</div> <!-- end bloc output left -->
-</div>
-
-<div id="bloc_input_right"> <!-- start bloc input right-->
-
-<div class="bloc_title bloc_title_bottom">
- Settings panel
-</div>
-
-<div class="bloc_content bloc_content_bottom">
-
-<TABLE BORDER="0"> 
-
-<TR>
-	<TH> 
-		Latency
-	</TH>
-	<TD class="bargraph">  
-		<!--bargraph-->
-		<div id="i13" class="openpicus_sld openpicus_sld_1 mceNonEditable">&nbsp;
-		</div>
-	</TD>
-	<TD>  
-		<div id="lbl_delay" class="openpicus_label openpicus_label_delay mceNonEditable" 
-		style="width: 64px; height: 12px;"><span class="label_content">10s</span>
-		</div>
-	</TD>
-</TR> 
-
-<TR>
-	<TH> 
-		Threshold
-	</TH>
-	<TD class="bargraph">  
-		<!--bargraph-->
-		<div id="i14" class="openpicus_sld openpicus_sld_1 mceNonEditable">&nbsp;
-		</div>
-	</TD>
-	<TD>  
-		<div id="lbl_seuil" 
-		class="openpicus_label openpicus_label_seuil mceNonEditable" 
-		style="width: 64px; height: 12px;"><span class="label_content">10%</span>
 	</div>
-	</TD>
-</TR> 
 
-<TR>
-	<TH> 
-		Rotation Angle	
-	</TH>
-	<TD class="bargraph">  
-		<!--bargraph-->
-		<div id="i15" class="openpicus_sld openpicus_sld_1 mceNonEditable">&nbsp;
+	<div id="bloc_input_right">
+		<div class="bloc_title">
+			If Obstacle
 		</div>
-	</TD>
-	<TD>  
-		<div id="lbl_mvmt" class="openpicus_label openpicus_label_mvmt mceNonEditable" 
-		style="width: 64px; height: 12px;"><span class="label_content">90deg</span>
-		</div>
-	</TD>
-</TR> 
-</TABLE> 
+		<div class="bloc_content bloc_content_bottom">
+		<div class="ligne">
+			<div class="logo">
+				<img src="img/stop_2.png" height="100%"> </img>
+			</div>
+			<div class="control">
+				<div id="i17" class="openpicus_chk mceNonEditable">
+                                </div>
 
-<br>
-<b>Detection of obstacle :</b>
-<br>
-<TABLE>
-<TR>
-	<TD>
-	Strategy if detected:
-	<TD>
-	<TD>
-	Detection test:
-	</TD>
-</TR>
-<TR>
-	<TD>
-		<ul> 
-		<li style="list-style-type:none;">  
-		<div id="i17" class="openpicus_chk openpicus_chk_21 mceNonEditable" 
-		style="width: 150px; height: 15px;">
-		Stop
-		</div>
-		</li>
-		<li style="list-style-type:none;"> 
-		<div id="i18" class="openpicus_chk openpicus_chk_22 mceNonEditable" 
-		style="width: 150px; height: 15px;">
-		Rotate and Move
-		</div>
-		</li>
-		</ul> 
-	</TD>
-	<TD>
-	<TD>
-		<ul> 
-		<li style="list-style-type:none;">  
-		<div id="i19" class="openpicus_chk openpicus_chk_23 mceNonEditable" 
-		style="width: 150px; height: 15px;">
-		Enabled
-		</div>
-		</li>
-		</ul> 
-		
-	</TD>
-</TR>
-</TABLE>
+			</div>	
+		</div>		
+		<div class="ligne">
+			<div class="logo">
+				<img src="img/return-right.png" height="100%"> </img>
+			</div>
+			<div class="control">
+				<div id="i18" class="openpicus_chk mceNonEditable">
+                                </div>
+			
+			</div>	
+		</div>		
+		<div class="ligne">
+			<div class="logo">
+				<img src="img/up.png" height="100%"> </img>
+			</div>
+			<div class="control">
+				<div id="i19" class="openpicus_chk mceNonEditable">
+                                </div>
 
-</div>
-</div> <!-- bloc content -->
-</div> <!-- end input bloc right-->
+			</div>	
+		</div>		
+		</div>
+	</div>
 </div> <!-- end input bloc -->
 </div> <!-- fin corps -->
+
 <!--HtmlContentEnd-->
 </div>
 <script type='text/javascript'>
