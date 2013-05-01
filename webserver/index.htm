@@ -219,20 +219,7 @@ var obj=/*ScriptContentStart*/[
     "noborder": false
   },
 /* Slide bars */
-  {
-    "idn": 16,
-    "id": "i16",
-    "type": "sld",
-    "index": 16,
-    "class": "openpicus_sld_16",
-    "typeclass": "openpicus_sld",
-    "editorclass": "openpicus_sld openpicus_sld_1 mceItemVisualAid mceItemLayer mceNonEditable",
-    "canSendEvents": false,
-    "continuousSend": false,
-    "scala_min": 0,
-    "scala_max": 255,
-    "step": 1
-  },
+/* time latency*/
   {
     "idn": 13,
     "id": "i13",
@@ -245,8 +232,10 @@ var obj=/*ScriptContentStart*/[
     "continuousSend": false,
     "scala_min": 0,
     "scala_max": 10000,
-    "step": 1000
+    "step": 1000,
+    "value": 5000
   },
+/* threshold */
   {
     "idn": 14,
     "id": "i14",
@@ -257,9 +246,11 @@ var obj=/*ScriptContentStart*/[
     "canSendEvents": true,
     "continuousSend": false,
     "scala_min": 0,
-    "scala_max": 100,
-    "step": 1
+    "scala_max": 255,
+    "step": 1,
+    "value": 40
   },
+/* Rotation angle */
   {
     "idn": 15,
     "id": "i15",
@@ -272,6 +263,22 @@ var obj=/*ScriptContentStart*/[
     "continuousSend": false,
     "scala_min": 0,
     "scala_max": 100,
+    "step": 5,
+    "value": 90
+  },
+/* Output ultrasound-sensor */
+  {
+    "idn": 16,
+    "id": "i16",
+    "type": "sld",
+    "index": 16,
+    "class": "openpicus_sld_16",
+    "typeclass": "openpicus_sld",
+    "editorclass": "openpicus_sld openpicus_sld_1 mceItemVisualAid mceItemLayer mceNonEditable",
+    "canSendEvents": false,
+    "continuousSend": false,
+    "scala_min": 0,
+    "scala_max": 255,
     "step": 1
   },
 
@@ -288,6 +295,7 @@ var obj=/*ScriptContentStart*/[
     "text": "Checkbox 0",
     "checked": false
   },
+/* if ultra sound value is...*/
   {
     "idn": 17,
     "id": "i17",
@@ -300,6 +308,7 @@ var obj=/*ScriptContentStart*/[
     "text": "Checkbox 0",
     "checked": false
   },
+/* if contact sensor ...*/
   {
     "idn": 18,
     "id": "i18",
@@ -312,14 +321,54 @@ var obj=/*ScriptContentStart*/[
     "text": "Checkbox 0",
     "checked": false
   },
+/* then stop */
   {
     "idn": 19,
     "id": "i19",
     "type": "chk",
     "index": 19,
-    "class": "openpicus_chk_19",
+    "class": "openpicus_chk",
     "typeclass": "openpicus_chk",
-    "editorclass": "openpicus_chk openpicus_chk_19 mceItemVisualAid mceItemLayer mceNonEditable",
+    "editorclass": "openpicus_chk openpicus_chk_1 mceItemVisualAid mceItemLayer mceNonEditable",
+    "canSendEvents": true,
+    "text": "Checkbox 0",
+    "checked": false
+  },
+/* then move forward */
+  {
+    "idn": 20,
+    "id": "i20",
+    "type": "chk",
+    "index": 20,
+    "class": "openpicus_chk",
+    "typeclass": "openpicus_chk",
+    "editorclass": "openpicus_chk openpicus_chk_1 mceItemVisualAid mceItemLayer mceNonEditable",
+    "canSendEvents": true,
+    "text": "Checkbox 0",
+    "checked": false
+  },
+/* then rotate */
+  {
+    "idn": 21,
+    "id": "i21",
+    "type": "chk",
+    "index": 21,
+    "class": "openpicus_chk",
+    "typeclass": "openpicus_chk",
+    "editorclass": "openpicus_chk openpicus_chk_1 mceItemVisualAid mceItemLayer mceNonEditable",
+    "canSendEvents": true,
+    "text": "Checkbox 0",
+    "checked": false
+  },
+/* then move forward */
+  {
+    "idn": 22,
+    "id": "i22",
+    "type": "chk",
+    "index": 22,
+    "class": "openpicus_chk_22",
+    "typeclass": "openpicus_chk",
+    "editorclass": "openpicus_chk openpicus_chk_1 mceItemVisualAid mceItemLayer mceNonEditable",
     "canSendEvents": true,
     "text": "Checkbox 0",
     "checked": false
@@ -395,235 +444,163 @@ var obj=/*ScriptContentStart*/[
 
 <div id="entete">
 <h1>Lego Rover Control Center
-<img src="img/NASA.svg" height="39" class="right"> </img>
+<img src="img/NASA.png" height="39" class="right"> </img>
 </h1>
 </div><!-- fin tete -->
 
 <div id="tweet">
-<div id="tweet_txt">
+<div id="i_tweet" class="openpicus_chk mceNonEditable">
+Enable tweets
+</div>
+<div id="tweet_txt" class="tweet">
 <b>Last tweet from mars :</b> 
 </div>
-<div id="tweet_content">
+<div id="tweet_content" class="tweet">
 @NXTSpaceApps : #OMG! There's a #cat playing with a box! 
-</div>
-<div id="i_tweet" class="openpicus_chk openpicus_chk_23 mceNonEditable">
-Enable tweets
 </div>
 
 </div>
 <div id="corps">
-	<div id="bloc_output"> <!-- start output bloc -->
-<!--
-<div class="bloc_title bloc_title_top">
-Output panel
-</div>
--->
-<div class="bloc_content bloc_content_top">
-<TABLE BORDER="0"> 
-<TR>
-	<TH> 
-		Touch sensor
-	</TH>
-	<TD>  
-		<div id="lbl_touche" class="openpicus_label openpicus_label_touche mceNonEditable" 
-		style="width: 64px; height: 12px;"><span class="label_content">Label 0</span>
-		</div>
-	</TD>
-</TR> 
-<TR>
-	<TH> 
-		Color sensor
-	</TH>
-	<TD id="fullColorBtn">
-	</TD>
-</TR> 
-<TR>
-	<TH> 
-		Ultra-sound sensor
-	</TH>
-	<TD class="bargraph">  
-		<!--bargraph-->
-		<div id="i16" class="openpicus_sld openpicus_sld_1 mceNonEditable">&nbsp;
-		</div>
-	</TD>
-</TR> 
-</TABLE> 
 
-	<!-- end output bloc -->
-	</div>
-</div>	
-	<div id="bloc_input">
-	<!-- start input bloc-->
-	<div id="bloc_input_left"> <!-- start bloc input left -->
-
-<div class="bloc_title bloc_title_bottom">
-Control panel
-</div>
-<div class="bloc_content bloc_content_bottom">
-<TABLE BORDER="0"> 
-<TR> 
-	<TD>
-		<!-- bouton 1 -->
-		<div id="i1" class="openpicus_btn openpicus_btn_1 mceNonEditable">&nbsp;
-		</div>
-	</TD> 
-	<TD> 
-		<!-- bouton 2 -->
-		<div id="i2" class="openpicus_btn openpicus_btn_1 mceNonEditable">&nbsp;
-		</div>
-	</TD> 
- 	<TD> 
-		<!-- bouton 3 -->
-		<div id="i3" class="openpicus_btn openpicus_btn_1 mceNonEditable">&nbsp;
-
-</TR> 
-<TR> 
- 	<TD>
-		<!-- bouton 4 -->
-		<div id="i4" class="openpicus_btn openpicus_btn_1 mceNonEditable">&nbsp;
-		</div>
-	</TD> 
- 	<TD> 
-		<!-- bouton 5 -->
-		<div id="i5" class="openpicus_btn openpicus_btn_1 mceNonEditable">&nbsp;
-		</div>	
-	</TD> 
-	<TD> 
-		<!-- bouton 6 -->
-		<div id="i6" class="openpicus_btn openpicus_btn_1 mceNonEditable">&nbsp;
-		</div>
-	</TD> 
-</TR> 
-<TR> 
-	<TD>
-		<!-- bouton 7 -->
-		<div id="i7" class="openpicus_btn openpicus_btn_1 mceNonEditable">&nbsp;
-		</div>
-	</TD> 
-	<TD> 
-		<!-- bouton 8 -->
-		<div id="i8" class="openpicus_btn openpicus_btn_1 mceNonEditable">&nbsp;
-		</div>
-	</TD> 
- 	<TD> 
-		<!-- bouton 9 -->
-		<div id="i9" class="openpicus_btn openpicus_btn_1 mceNonEditable">&nbsp;
-
-</TR> 
-</TABLE> 
-
-</div> <!-- end bloc output left -->
-</div>
-
-<div id="bloc_input_right"> <!-- start bloc input right-->
-
-<div class="bloc_title bloc_title_bottom">
- Settings panel
-</div>
-
-<div class="bloc_content bloc_content_bottom">
-
-<TABLE BORDER="0"> 
-
-<TR>
-	<TH> 
-		Latency
-	</TH>
-	<TD class="bargraph">  
-		<!--bargraph-->
-		<div id="i13" class="openpicus_sld openpicus_sld_1 mceNonEditable">&nbsp;
-		</div>
-	</TD>
-	<TD>  
-		<div id="lbl_delay" class="openpicus_label openpicus_label_delay mceNonEditable" 
-		style="width: 64px; height: 12px;"><span class="label_content">10s</span>
-		</div>
-	</TD>
-</TR> 
-
-<TR>
-	<TH> 
-		Threshold
-	</TH>
-	<TD class="bargraph">  
-		<!--bargraph-->
-		<div id="i14" class="openpicus_sld openpicus_sld_1 mceNonEditable">&nbsp;
-		</div>
-	</TD>
-	<TD>  
-		<div id="lbl_seuil" 
-		class="openpicus_label openpicus_label_seuil mceNonEditable" 
-		style="width: 64px; height: 12px;"><span class="label_content">10%</span>
-	</div>
-	</TD>
-</TR> 
-
-<TR>
-	<TH> 
-		Rotation Angle	
-	</TH>
-	<TD class="bargraph">  
-		<!--bargraph-->
-		<div id="i15" class="openpicus_sld openpicus_sld_1 mceNonEditable">&nbsp;
-		</div>
-	</TD>
-	<TD>  
-		<div id="lbl_mvmt" class="openpicus_label openpicus_label_mvmt mceNonEditable" 
-		style="width: 64px; height: 12px;"><span class="label_content">90deg</span>
-		</div>
-	</TD>
-</TR> 
-</TABLE> 
-
-<br>
-<b>Detection of obstacle :</b>
-<br>
-<TABLE>
-<TR>
-	<TD>
-	Strategy if detected:
-	<TD>
-	<TD>
-	Detection test:
-	</TD>
-</TR>
-<TR>
-	<TD>
-		<ul> 
-		<li style="list-style-type:none;">  
-		<div id="i17" class="openpicus_chk openpicus_chk_21 mceNonEditable" 
-		style="width: 150px; height: 15px;">
-		Stop
-		</div>
-		</li>
-		<li style="list-style-type:none;"> 
-		<div id="i18" class="openpicus_chk openpicus_chk_22 mceNonEditable" 
-		style="width: 150px; height: 15px;">
-		Rotate and Move
-		</div>
-		</li>
-		</ul> 
-	</TD>
-	<TD>
-	<TD>
-		<ul> 
-		<li style="list-style-type:none;">  
-		<div id="i19" class="openpicus_chk openpicus_chk_23 mceNonEditable" 
-		style="width: 150px; height: 15px;">
-		Enabled
-		</div>
-		</li>
-		</ul> 
+	<div id="corps_gauche">
+		<div id="bloc_output">
+			<div class="output_title">
+				Color sensor
+			</div>
+			<div class="output_content">
+				<div id="color_sensor"></div>
+				<div id="color_sensor_details">
+					<div class="ligne">
+						<div id="red"></div>
+					</div>
+					<div class="ligne">
+						<div id="green"></div>
+					</div>
+					<div class="ligne">
+						<div id="blue"></div>
+					</div>
+				</div>
+			</div>
 		
-	</TD>
-</TR>
-</TABLE>
+			<div class="output_title">
+				Ultra-sound sensor
+			</div>
+			<div class="output_content">
+				<div id="i16" class="openpicus_sld openpicus_sld_1 mceNonEditable" style="display:inline-block; margin-left:10px;">&nbsp;
+				</div><span id="lbl16">255cm</span>
+			</div>
+		
+			<div class="output_title">
+				Contact sensor
+			</div>
+			<div class="output_content">
+				Sensor value : 
+				<div id="lbl_touche" 
+					class="openpicus_label openpicus_label_touche mceNonEditable">
+					<span class="label_content">NO CONTACT</span>
+				</div>
+			</div>
 
-</div>
-</div> <!-- bloc content -->
-</div> <!-- end input bloc right-->
-</div> <!-- end input bloc -->
+		</div>
+	</div>
+	<div id="corps_droite">
+		<div id="bloc_controls"> <!-- start bloc input left -->
+			<div class="bloc_title">
+				Controls
+			</div>
+
+			<div class="bloc_content">
+			  <div class="ligne" >
+				<!-- bouton 1 -->
+				<div id="i1" class="openpicus_btn openpicus_btn_1 mceNonEditable">
+				&nbsp;</div>
+				<!-- bouton 2 -->
+				<div id="i2" class="openpicus_btn openpicus_btn_1 mceNonEditable">
+				&nbsp;</div>
+				<!-- bouton 3 -->
+				<div id="i3" class="openpicus_btn openpicus_btn_1 mceNonEditable">
+				&nbsp;</div>
+
+		  	</div>
+
+		  	<div class="ligne" >
+				<!-- bouton 4 -->
+				<div id="i4" class="openpicus_btn openpicus_btn_1 mceNonEditable">
+				&nbsp;</div>
+				<!-- bouton 5 -->
+				<div id="i5" class="openpicus_btn openpicus_btn_1 mceNonEditable">
+				&nbsp;</div>	
+				<!-- bouton 6 -->
+				<div id="i6" class="openpicus_btn openpicus_btn_1 mceNonEditable">
+				&nbsp;</div>
+			  </div>
+			  <div class="ligne">
+				<!-- bouton 7 -->
+				<div id="i7" class="openpicus_btn openpicus_btn_1 mceNonEditable">
+				&nbsp;</div>
+				<!-- bouton 8 -->
+				<div id="i8" class="openpicus_btn openpicus_btn_1 mceNonEditable">
+				&nbsp;</div>
+				<!-- bouton 9 -->
+				<div id="i9" class="openpicus_btn openpicus_btn_1 mceNonEditable">
+				&nbsp;</div>
+			  </div>	
+			</div> <!-- end bloc content bottom -->
+	
+		</div>
+		<div id="latency" class="bloc_content">
+			<div style="margin-top:10px;"></div>
+			Time latency :</br>
+			<div id="i13" class="openpicus_sld mceNonEditable">&nbsp;
+        	    	</div> <span id="lbl13">5sec</span>
+		</div><!--end bloc input left-->
+
+		<div id="bloc_input_if">
+			<div class="bloc_title">
+				If ...
+			</div>
+
+			<div class="bloc_content bloc_content_bottom">
+
+				<div id="i17" class="openpicus_chk mceNonEditable">
+				  The ultrasound sensor value is less than :
+                	        </div> 
+
+				<div id="i14" class="openpicus_sld mceNonEditable">&nbsp;
+                	        </div> <span id="lbl14">40cm</span>
+				<div style="margin-top:10px;"></div>
+				<div id="i18" class="openpicus_chk mceNonEditable">
+				  The contact sensor value is 1
+                	        </div> 
+			</div>
+		</div>
+
+	<div id="bloc_input_then">
+		<div class="bloc_title">
+			Then ...
+		</div>
+		<div class="bloc_content">
+			<div id="i19" class="openpicus_chk mceNonEditable">
+				Stop
+                        </div> 
+			<div id="i20" class="openpicus_chk mceNonEditable">
+				Move backward
+                        </div> 
+			<div id="i21" class="openpicus_chk mceNonEditable">
+				Turn right with an angle of :
+                        </div> 
+			<div id="i15" class="openpicus_sld mceNonEditable">&nbsp;
+                        </div> <span id="lbl15">90deg</span>
+			<div style="margin-top:10px;"></div>
+
+			<div id="i22" class="openpicus_chk mceNonEditable">
+				Move forward
+                        </div> 
+			
+		</div>
+	</div>
 </div> <!-- fin corps -->
+
 <!--HtmlContentEnd-->
 </div>
 <script type='text/javascript'>
